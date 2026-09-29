@@ -1,0 +1,75 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Unsubscribe" description="Leave the TravelDot waitlist." noindex>
+  <section class="wrap">
+    <div class="prose">
+      <div data-view="ask" tabindex="-1">
+        <h1>Unsubscribe from the waitlist</h1>
+        <p>You'll stop getting TravelDot waitlist emails, including the launch announcement.</p>
+        <button class="button" type="button" data-unsubscribe>
+          Unsubscribe
+        </button>
+        <p class="status" role="status"></p>
+        <noscript>
+          <p>This page needs JavaScript turned on to unsubscribe.</p>
+        </noscript>
+      </div>
+
+      <div data-view="done" tabindex="-1" hidden>
+        <h1>You're unsubscribed</h1>
+        <p>You won't get any more waitlist emails.</p>
+      </div>
+
+      <div data-view="invalid" tabindex="-1" hidden>
+        <h1>This link doesn't work</h1>
+        <p>
+          It may have expired. Email{" "}
+          <a href="mailto:support@traveldot.app">support@traveldot.app</a>
+          and we'll take you off the list.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { postToApi } from "../../lib/api";
+  import { showView, tokenFromUrl } from "../../lib/views";
+
+  const button = document.querySelector<HTMLButtonElement>("[data-unsubscribe]")!;
+  const status = document.querySelector<HTMLElement>(".status")!;
+  const token = tokenFromUrl();
+
+  if (!token) showView("invalid");
+
+  // Only a click unsubscribes, because mail scanners open every link in an email.
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    status.textContent = "Unsubscribing…";
+    const code = await postToApi(
+      `/api/waitlist/unsubscribe?token=${encodeURIComponent(token ?? "")}`,
+    );
+
+    if (code === 204) return showView("done");
+    if (code === 404) return showView("invalid");
+    status.textContent = "The waitlist isn't reachable right now. Try again in a few minutes.";
+    button.disabled = false;
+  });
+</script>
+
+<style>
+  section {
+    padding-top: 2.5rem;
+  }
+
+  [data-view]:focus {
+    outline: none;
+  }
+
+  .status {
+    margin-top: 1rem;
+    color: var(--asphalt);
+  }
+</style>

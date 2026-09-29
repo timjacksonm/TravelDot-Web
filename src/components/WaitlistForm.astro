@@ -1,0 +1,145 @@
+---
+import { PUBLIC_TURNSTILE_SITE_KEY } from "astro:env/client";
+---
+
+<div class="waitlist" data-waitlist>
+  <form>
+    <label for="waitlist-email">Email address</label>
+    <div class="row">
+      <input
+        id="waitlist-email"
+        name="email"
+        type="email"
+        autocomplete="email"
+        required
+        placeholder="you@example.com"
+      />
+      <button class="button" type="submit">
+        Join the waitlist
+      </button>
+    </div>
+    <div
+      class="cf-turnstile"
+      data-sitekey={PUBLIC_TURNSTILE_SITE_KEY}
+      data-action="waitlist"
+      data-appearance="interaction-only"
+    ></div>
+    <p class="status" role="status"></p>
+  </form>
+
+  <div class="done" tabindex="-1" hidden>
+    <p class="done-title">Check your inbox</p>
+    <p>
+      If <strong data-email></strong> isn't on the waitlist yet, we sent it a confirmation link.
+      Click the link to finish signing up.
+    </p>
+  </div>
+</div>
+
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<script>
+  import { postToApi } from "../lib/api";
+
+  const root = document.querySelector<HTMLElement>("[data-waitlist]")!;
+  const form = root.querySelector("form")!;
+  const button = form.querySelector("button")!;
+  const status = form.querySelector<HTMLElement>(".status")!;
+  const widget = form.querySelector<HTMLElement>(".cf-turnstile")!;
+  const done = root.querySelector<HTMLElement>(".done")!;
+
+  const errors: Record<number, string> = {
+    400: "That didn't go through. Check the email address and try again.",
+    429: "Too many signups from this network. Try again in an hour.",
+  };
+  const unreachable = "The waitlist isn't reachable right now. Try again in a few minutes.";
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const email = String(data.get("email")).trim();
+    const turnstileToken = String(data.get("cf-turnstile-response") ?? "");
+
+    if (!turnstileToken) {
+      status.textContent = "Still running the spam check. Try again in a moment.";
+      return;
+    }
+
+    button.disabled = true;
+    status.textContent = "Joining…";
+    const code = await postToApi("/api/waitlist", { email, turnstileToken });
+
+    if (code === 202) {
+      done.querySelector("[data-email]")!.textContent = email;
+      form.hidden = true;
+      done.hidden = false;
+      done.focus();
+      return;
+    }
+
+    // Turnstile tokens are single-use, so a failed attempt needs a fresh one.
+    window.turnstile?.reset(widget);
+    status.textContent = errors[code] ?? unreachable;
+    button.disabled = false;
+  });
+</script>
+
+<style>
+  label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  input {
+    flex: 1 1 14rem;
+    min-width: 0;
+    font: inherit;
+    padding: 0.65rem 0.8rem;
+    border: 2px solid var(--line);
+    border-radius: 0.375rem;
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  input:focus-visible {
+    border-color: var(--route);
+    outline: none;
+  }
+
+  .status {
+    min-height: 1.55em;
+    margin: 0.75rem 0 0;
+    color: var(--asphalt);
+  }
+
+  .status:empty {
+    min-height: 0;
+  }
+
+  .done {
+    padding: 1rem 1.25rem;
+    border-left: 4px solid var(--route);
+    background: var(--surface);
+  }
+
+  .done:focus {
+    outline: none;
+  }
+
+  .done-title {
+    font-weight: 800;
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .done p:last-child {
+    margin: 0;
+  }
+</style>

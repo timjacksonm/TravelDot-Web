@@ -1,13 +1,19 @@
 ---
+import "@fontsource-variable/overpass";
+import "../styles/global.css";
+
 interface Props {
   // Page name for the browser tab, e.g. "Privacy". Omit on the home page.
   title?: string;
   description: string;
+  // Token pages and the 404 have nothing worth indexing.
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false } = Astro.props;
 
 const pageTitle = title ? `${title} · TravelDot` : "TravelDot";
+const year = new Date().getFullYear();
 ---
 
 <html lang="en">
@@ -15,31 +21,76 @@ const pageTitle = title ? `${title} · TravelDot` : "TravelDot";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
   </head>
   <body>
+    <header class="wrap site-header">
+      <a class="wordmark" href="/">
+        <span class="dot" aria-hidden="true"></span>TravelDot
+      </a>
+    </header>
     <main>
       <slot />
     </main>
+    <footer class="wrap">
+      <div class="site-footer">
+        <nav aria-label="Site">
+          <a href="/support">Support</a>
+          <a href="/privacy">Privacy</a>
+        </nav>
+        <p>© {year} TravelDot</p>
+      </div>
+    </footer>
   </body>
 </html>
 
-<style is:global>
-  :root {
-    color-scheme: light dark;
-    font-family: system-ui, sans-serif;
-    line-height: 1.5;
+<style>
+  .site-header {
+    padding-block: 1.25rem;
   }
 
-  body {
-    margin: 0;
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .dot {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: var(--route);
   }
 
   main {
-    max-width: 40rem;
-    margin: 0 auto;
-    padding: 3rem 1rem;
+    min-height: 60vh;
+  }
+
+  .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 5rem;
+    padding-block: 2rem;
+    border-top: 1px solid var(--line);
+    color: var(--asphalt);
+    font-size: 0.9375rem;
+  }
+
+  .site-footer nav {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .site-footer p {
+    margin: 0;
   }
 </style>

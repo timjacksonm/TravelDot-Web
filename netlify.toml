@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# The API only accepts requests from traveldot.app, so previews fake it and use Cloudflare's
+# always-pass test key. Production's PUBLIC_TURNSTILE_SITE_KEY is set in the Netlify UI.
+[context.deploy-preview.environment]
+  PUBLIC_API_MOCK = "true"
+  PUBLIC_TURNSTILE_SITE_KEY = "1x00000000000000000000AA"
+
+[context.branch-deploy.environment]
+  PUBLIC_API_MOCK = "true"
+  PUBLIC_TURNSTILE_SITE_KEY = "1x00000000000000000000AA"

@@ -1,0 +1,24 @@
+---
+import ProseLayout from "../layouts/ProseLayout.astro";
+
+const frontmatter = {
+  title: "Support",
+  description: "How to reach TravelDot for help with the app or the waitlist.",
+};
+---
+
+<ProseLayout frontmatter={frontmatter}>
+  <p>
+    Email <a href="mailto:support@traveldot.app">support@traveldot.app</a> with questions about the
+    app or the waitlist.
+  </p>
+
+  <h2>If something in the app looks wrong</h2>
+  <p>
+    Tell us where your trip started and ended, and roughly when you checked it. That's enough for us
+    to find what the app showed you.
+  </p>
+
+  <h2>Leaving the waitlist</h2>
+  <p>Every waitlist email has an unsubscribe link at the bottom.</p>
+</ProseLayout>

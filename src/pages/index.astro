@@ -1,36 +1,128 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import RouteLog from "../components/RouteLog.astro";
+import WaitlistForm from "../components/WaitlistForm.astro";
 
 const shows = [
-  "Closures and crashes",
-  "Road conditions reported by snowplows",
-  "Weather alerts along your route",
+  {
+    title: "Closures and crashes",
+    body: "Where they are on your route, and what's blocked.",
+  },
+  {
+    title: "Road conditions",
+    body: "What plow crews report about the pavement on each stretch, like snow cover or ice.",
+  },
+  {
+    title: "Weather alerts",
+    body: "Active alerts for the places your route passes through, like a winter storm warning.",
+  },
 ];
 ---
 
 <BaseLayout description="TravelDot checks your Minnesota route for closures, crashes, plow-reported road conditions and weather alerts before you leave.">
-  <h1>Know your road before you go.</h1>
-  <p>
-    Enter where you're starting and where you're headed. TravelDot checks every stretch of the route
-    against live road reports and current weather, then tells you what's on your road in plain
-    language.
-  </p>
+  <section class="wrap hero">
+    <div class="hero-copy">
+      <h1>Know your road before you go.</h1>
+      <p class="lede">
+        Enter where you're starting and where you're headed. TravelDot checks every stretch of the
+        route against live road reports and current weather, then tells you what's on your road in
+        plain language.
+      </p>
+      <p id="waitlist" class="platforms">
+        Coming to iPhone and Android. Join the waitlist and we'll email you when it's out.
+      </p>
+      <WaitlistForm />
+    </div>
+    <RouteLog />
+  </section>
 
-  <h2>What it shows</h2>
-  <ul>
-    {shows.map((item) => (
-      <li>{item}</li>
-    ))}
-  </ul>
-  <p>When you're ready to leave, one tap opens the trip in your navigation app.</p>
+  <section class="wrap band">
+    <h2>What a trip check shows</h2>
+    <dl class="shows">
+      {shows.map((item) => (
+        <div>
+          <dt>{item.title}</dt>
+          <dd>{item.body}</dd>
+        </div>
+      ))}
+    </dl>
+    <p class="prose">
+      TravelDot reports what's out there and leaves the decision to you. When you're ready to leave,
+      one tap opens the trip in your navigation app.
+    </p>
+  </section>
 
-  <h2>Starting with Minnesota</h2>
-  <p>
-    TravelDot launches in Minnesota and covers the state's interstates, US highways and state
-    highways. County and city roads aren't included. Other states that publish 511 road data may
-    come next.
-  </p>
-
-  <h2 id="waitlist">Coming to iPhone and Android</h2>
-  <p>Join the waitlist and we'll email you when it's out.</p>
+  <section class="wrap band">
+    <div class="prose">
+      <h2>Starting with Minnesota</h2>
+      <p>
+        TravelDot launches in Minnesota and covers the state's interstates, US highways and state
+        highways. County and city roads aren't included. Other states that publish 511 road data may
+        come next.
+      </p>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    gap: 3rem;
+    align-items: start;
+    padding-block: 2.5rem 1rem;
+  }
+
+  @media (min-width: 56rem) {
+    .hero {
+      grid-template-columns: 1.15fr 1fr;
+      gap: 4rem;
+      padding-top: 4rem;
+    }
+  }
+
+  .hero-copy {
+    max-width: var(--measure);
+  }
+
+  .lede {
+    font-size: 1.25rem;
+    color: var(--asphalt);
+  }
+
+  .platforms {
+    margin-top: 2rem;
+    font-weight: 600;
+  }
+
+  .band {
+    margin-top: 5rem;
+  }
+
+  .shows {
+    display: grid;
+    gap: 1.5rem 2.5rem;
+    margin: 1.5rem 0 2rem;
+  }
+
+  @media (min-width: 48rem) {
+    .shows {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .shows div {
+    padding-top: 1rem;
+    border-top: 4px solid var(--route);
+  }
+
+  dt {
+    font-weight: 800;
+    font-size: 1.1875rem;
+    margin-bottom: 0.25rem;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--asphalt);
+  }
+</style>

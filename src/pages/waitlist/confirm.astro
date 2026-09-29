@@ -1,0 +1,69 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Confirm your email"
+  description="Confirm your spot on the TravelDot waitlist."
+  noindex
+>
+  <section class="wrap">
+    <div class="prose">
+      <div data-view="pending" tabindex="-1">
+        <h1>Confirming your email</h1>
+        <p>This takes a second.</p>
+        <noscript>
+          <p>This page needs JavaScript turned on to confirm your email.</p>
+        </noscript>
+      </div>
+
+      <div data-view="done" tabindex="-1" hidden>
+        <h1>You're on the waitlist</h1>
+        <p>We'll email you when TravelDot is out.</p>
+        <p>
+          <a href="/">Back to the home page</a>
+        </p>
+      </div>
+
+      <div data-view="invalid" tabindex="-1" hidden>
+        <h1>This link doesn't work</h1>
+        <p>
+          It may have expired. <a href="/#waitlist">Sign up again</a> and we'll send you a new one.
+        </p>
+      </div>
+
+      <div data-view="error" tabindex="-1" hidden>
+        <h1>Your email isn't confirmed yet</h1>
+        <p>
+          The waitlist isn't reachable right now. Reload this page in a few minutes to try again.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { postToApi } from "../../lib/api";
+  import { showView, tokenFromUrl } from "../../lib/views";
+
+  // Posting on load is safe here because the email links to this page, not to the API, and mail
+  // scanners don't run JavaScript.
+  const token = tokenFromUrl();
+  if (!token) {
+    showView("invalid");
+  } else {
+    postToApi("/api/waitlist/confirm", { token }).then((code) =>
+      showView(code === 204 ? "done" : code === 404 ? "invalid" : "error"),
+    );
+  }
+</script>
+
+<style>
+  section {
+    padding-top: 2.5rem;
+  }
+
+  [data-view]:focus {
+    outline: none;
+  }
+</style>
