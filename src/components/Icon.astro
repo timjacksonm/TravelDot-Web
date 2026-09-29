@@ -1,0 +1,90 @@
+---
+import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRight,
+  faArrowUpFromBracket,
+  faBan,
+  faCarBurst,
+  faChevronDown,
+  faChevronRight,
+  faChevronUp,
+  faCircleInfo,
+  faCloud,
+  faDroplet,
+  faEyeSlash,
+  faSnowflake,
+  faTruck,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
+import { faThumbsDown, faThumbsUp } from "@fortawesome/free-regular-svg-icons";
+import phCaretDown from "@phosphor-icons/core/assets/regular/caret-down.svg?raw";
+import phCheck from "@phosphor-icons/core/assets/regular/check.svg?raw";
+import phEnvelope from "@phosphor-icons/core/assets/regular/envelope-simple.svg?raw";
+import phInfo from "@phosphor-icons/core/assets/regular/info.svg?raw";
+
+const fontAwesome: Record<string, IconDefinition> = {
+  "arrow-right": faArrowRight,
+  "arrow-up-from-bracket": faArrowUpFromBracket,
+  ban: faBan,
+  "car-burst": faCarBurst,
+  "chevron-down": faChevronDown,
+  "chevron-right": faChevronRight,
+  "chevron-up": faChevronUp,
+  "circle-info": faCircleInfo,
+  cloud: faCloud,
+  droplet: faDroplet,
+  "eye-slash": faEyeSlash,
+  snowflake: faSnowflake,
+  truck: faTruck,
+  xmark: faXmark,
+  "thumbs-up": faThumbsUp,
+  "thumbs-down": faThumbsDown,
+};
+
+// Material Symbols severe_cold at the design's settings (FILL 1, wght 500, opsz 24), extracted from the
+// font so the page needs no icon font.
+const severeCold = `<svg viewBox="0 96 960 960"><path d="M807 502Q788 502 775.0 488.5Q762 475 762 456Q762 437 775.0 423.5Q788 410 807 410Q827 410 840.0 423.5Q853 437 853 456Q853 475 840.0 488.5Q827 502 807 502ZM396 990V845L291 950L230 888L396 723V661H334L168 826L107 765L211 661H67V573H211L107 469L168 408L334 573H396V511L230 346L291 285L396 389V245H483V389L588 285L649 346L483 511V573H812V661H667L772 765L711 826L545 661H483V723L649 888L588 950L483 845V990ZM762 370V159H853V370Z"/></svg>`;
+
+const rawSvgs: Record<string, string> = {
+  "severe-cold": severeCold,
+  "ph-caret-down": phCaretDown,
+  "ph-check": phCheck,
+  "ph-envelope": phEnvelope,
+  "ph-info": phInfo,
+};
+
+export type IconName = keyof typeof fontAwesome | keyof typeof rawSvgs;
+
+interface Props {
+  name: IconName;
+  class?: string;
+}
+
+const { name, class: className } = Astro.props;
+
+let viewBox: string;
+let paths: string[];
+
+const fa = fontAwesome[name];
+if (fa) {
+  const [width, height, , , path] = fa.icon;
+  viewBox = `0 0 ${width} ${height}`;
+  paths = Array.isArray(path) ? path : [path];
+} else {
+  const raw = rawSvgs[name];
+  if (!raw) throw new Error(`Unknown icon: ${name}`);
+  viewBox = raw.match(/viewBox="([^"]+)"/)![1];
+  paths = [...raw.matchAll(/<path d="([^"]+)"/g)].map((m) => m[1]);
+}
+---
+
+<svg
+  class:list={["icon", { "icon-ms": name === "severe-cold" }, className]}
+  viewBox={viewBox}
+  aria-hidden="true"
+  focusable="false"
+>
+  {paths.map((d) => (
+    <path d={d} />
+  ))}
+</svg>

@@ -1,7 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
   <style>
-    circle { fill: #1f4fa3; }
-    @media (prefers-color-scheme: dark) { circle { fill: #8fb0ff; } }
+    .stem { stroke: #161826; }
+    .dot { fill: #0E8FA6; }
+    @media (prefers-color-scheme: dark) {
+      .stem { stroke: #e9e9ed; }
+      .dot { fill: #2BC6E0; }
+    }
   </style>
-  <circle cx="16" cy="16" r="13" />
+  <path class="stem" d="M50 40 V88" stroke-width="8" stroke-linecap="round" />
+  <path d="M19 45 C19 39, 24 36, 34 36 H66 C76 36, 80 33, 80 26" stroke="#80818a" stroke-width="7" stroke-linecap="round" />
+  <circle class="dot" cx="80" cy="16" r="12" />
 </svg>

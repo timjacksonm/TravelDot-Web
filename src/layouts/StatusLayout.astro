@@ -1,0 +1,81 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+// Confirm, unsubscribe and the 404: one short message, vertically centered.
+interface Props {
+  title: string;
+  description: string;
+  glow?: "page";
+}
+
+const { title, description, glow } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} glow={glow} noindex>
+  <main class="wrap status-main">
+    <slot />
+  </main>
+</BaseLayout>
+
+<style>
+  .status-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding-top: clamp(40px, 10vw, 120px);
+    padding-bottom: clamp(40px, 8vw, 96px);
+  }
+
+  .status-main :global(.status) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    max-width: 620px;
+    width: 100%;
+  }
+
+  .status-main :global(.status[hidden]) {
+    display: none;
+  }
+
+  .status-main :global(.status:focus) {
+    outline: none;
+  }
+
+  .status-main :global(h1) {
+    font-size: clamp(38px, 5.4vw, 60px);
+    line-height: 1.03;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .status-main :global(.status-lede) {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--td-soft);
+    text-wrap: pretty;
+    overflow-wrap: anywhere;
+  }
+
+  .status-main :global(.status-note) {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--td-soft);
+    text-wrap: pretty;
+  }
+
+  .status-main :global(.status-note .mono) {
+    font-size: 15px;
+    color: var(--color-text);
+  }
+
+  .status-main :global(.status-error:empty) {
+    display: none;
+  }
+
+  .status-main :global(.status-error) {
+    font-size: 15px;
+    color: var(--color-text);
+  }
+</style>

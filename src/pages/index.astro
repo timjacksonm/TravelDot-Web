@@ -1,128 +1,260 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import RouteLog from "../components/RouteLog.astro";
+import ExampleResult from "../components/ExampleResult.astro";
+import Icon, { type IconName } from "../components/Icon.astro";
+import MinnesotaMap from "../components/MinnesotaMap.astro";
 import WaitlistForm from "../components/WaitlistForm.astro";
 
-const shows = [
-  {
-    title: "Closures and crashes",
-    body: "Where they are on your route, and what's blocked.",
-  },
-  {
-    title: "Road conditions",
-    body: "What plow crews report about the pavement on each stretch, like snow cover or ice.",
-  },
-  {
-    title: "Weather alerts",
-    body: "Active alerts for the places your route passes through, like a winter storm warning.",
-  },
+const shows: [IconName, string][] = [
+  ["snowflake", "Road conditions: ice, snow, wet pavement, visibility"],
+  [
+    "car-burst",
+    "Incidents: crashes, stalled vehicles, debris, including recently cleared incidents",
+  ],
+  ["ban", "Advisories: closures, lane closures, detours"],
+  [
+    "cloud",
+    "Weather: conditions at your origin and destination, with an hourly forecast available for a closer look",
+  ],
 ];
 ---
 
-<BaseLayout description="TravelDot checks your Minnesota route for closures, crashes, plow-reported road conditions and weather alerts before you leave.">
-  <section class="wrap hero">
-    <div class="hero-copy">
-      <h1>Know your road before you go.</h1>
+<BaseLayout
+  fullTitle="TravelDot — Know before you go"
+  description="Road conditions from official transportation feeds and reports, summarized in plain language so you know what to expect along your drive. Coming to iPhone and Android."
+  current="home"
+  glow="home"
+>
+  <main class="wrap">
+    <section class="hero">
+      <div class="kicker">Coming to iPhone and Android</div>
+      <h1>Know what’s ahead before you hit the road.</h1>
       <p class="lede">
-        Enter where you're starting and where you're headed. TravelDot checks every stretch of the
-        route against live road reports and current weather, then tells you what's on your road in
-        plain language.
+        Road conditions from official transportation feeds and reports, summarized in plain language
+        so you know what to expect along your route.
       </p>
-      <p id="waitlist" class="platforms">
-        Coming to iPhone and Android. Join the waitlist and we'll email you when it's out.
-      </p>
+      <ul class="checks">
+        <li>
+          <Icon name="ph-check" />
+          <span>One summary for your whole drive, not a map full of pins.</span>
+        </li>
+        <li>
+          <Icon name="ph-check" />
+          <span>Take your route into your preferred navigation app when you're ready to go.</span>
+        </li>
+      </ul>
       <WaitlistForm />
-    </div>
-    <RouteLog />
-  </section>
+    </section>
 
-  <section class="wrap band">
-    <h2>What a trip check shows</h2>
-    <dl class="shows">
-      {shows.map((item) => (
-        <div>
-          <dt>{item.title}</dt>
-          <dd>{item.body}</dd>
+    <div class="rule"></div>
+
+    <section class="shows">
+      <div class="shows-copy">
+        <div class="shows-intro">
+          <h2>What a trip check shows</h2>
+          <p>
+            Each report tells you what it is, where it was reported, which direction it affects, and
+            when the information was last updated.
+          </p>
         </div>
-      ))}
-    </dl>
-    <p class="prose">
-      TravelDot reports what's out there and leaves the decision to you. When you're ready to leave,
-      one tap opens the trip in your navigation app.
-    </p>
-  </section>
+        <ul class="shows-list">
+          {shows.map(([icon, text]) => (
+            <li>
+              <div class="shows-icon">
+                <Icon name={icon} />
+              </div>
+              <span>{text}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <ExampleResult />
+    </section>
 
-  <section class="wrap band">
-    <div class="prose">
-      <h2>Starting with Minnesota</h2>
+    <div class="rule"></div>
+
+    <section class="minnesota">
+      <div class="minnesota-copy">
+        <h2>All of Minnesota. Built on the Iron Range.</h2>
+        <p>
+          TravelDot covers all of Minnesota at launch. It started on the Iron Range, where winter
+          weather can change road conditions quickly and knowing what’s ahead matters.
+        </p>
+      </div>
+      <MinnesotaMap />
+    </section>
+
+    <div class="rule"></div>
+
+    <section class="contact">
+      <h2>Contact TravelDot</h2>
       <p>
-        TravelDot launches in Minnesota and covers the state's interstates, US highways and state
-        highways. County and city roads aren't included. Other states that publish 511 road data may
-        come next.
+        Have a question, found something that looks off, or have an idea for a better trip check?
       </p>
-    </div>
-  </section>
+      <a class="mono contact-email" href="mailto:support@traveldot.app">
+        support@traveldot.app
+      </a>
+      <p class="contact-note">We’d love to hear from you.</p>
+    </section>
+  </main>
 </BaseLayout>
 
 <style>
+  main {
+    flex: 1;
+  }
+
   .hero {
-    display: grid;
-    gap: 3rem;
-    align-items: start;
-    padding-block: 2.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 680px;
+    padding: clamp(40px, 9vw, 112px) 0 clamp(56px, 8vw, 104px);
   }
 
-  @media (min-width: 56rem) {
-    .hero {
-      grid-template-columns: 1.15fr 1fr;
-      gap: 4rem;
-      padding-top: 4rem;
-    }
+  h1 {
+    font-size: clamp(40px, 6.4vw, 72px);
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
   }
 
-  .hero-copy {
-    max-width: var(--measure);
+  h2 {
+    font-size: clamp(30px, 4vw, 44px);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
   }
 
   .lede {
-    font-size: 1.25rem;
-    color: var(--asphalt);
+    font-size: clamp(18px, 1.8vw, 20px);
+    line-height: 1.55;
+    color: var(--td-soft);
+    text-wrap: pretty;
   }
 
-  .platforms {
-    margin-top: 2rem;
-    font-weight: 600;
+  .checks,
+  .shows-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
   }
 
-  .band {
-    margin-top: 5rem;
+  .checks {
+    gap: 12px;
+  }
+
+  .checks li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 17px;
+    line-height: 1.45;
+  }
+
+  .checks :global(.icon) {
+    font-size: 19px;
+    margin-top: 2px;
+    color: var(--color-accent);
   }
 
   .shows {
     display: grid;
-    gap: 1.5rem 2.5rem;
-    margin: 1.5rem 0 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+    gap: 48px clamp(40px, 6vw, 80px);
+    align-items: start;
+    padding: clamp(56px, 8vw, 104px) 0;
   }
 
-  @media (min-width: 48rem) {
-    .shows {
-      grid-template-columns: repeat(3, 1fr);
-    }
+  .shows-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    min-width: 0;
   }
 
-  .shows div {
-    padding-top: 1rem;
-    border-top: 4px solid var(--route);
+  .shows-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 
-  dt {
-    font-weight: 800;
-    font-size: 1.1875rem;
-    margin-bottom: 0.25rem;
+  .shows-intro p,
+  .minnesota-copy p,
+  .contact p {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--td-soft);
+    text-wrap: pretty;
   }
 
-  dd {
-    margin: 0;
-    color: var(--asphalt);
+  .shows-list {
+    gap: 18px;
+  }
+
+  .shows-list li {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    font-size: 17px;
+  }
+
+  .shows-icon {
+    width: 36px;
+    height: 36px;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    font-size: 16px;
+  }
+
+  .minnesota {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+    gap: 40px clamp(40px, 6vw, 80px);
+    align-items: center;
+    padding: clamp(56px, 8vw, 104px) 0;
+  }
+
+  .minnesota-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .minnesota-copy h2 {
+    text-wrap: balance;
+  }
+
+  .contact {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    max-width: 620px;
+    padding: clamp(56px, 8vw, 96px) 0 clamp(32px, 4vw, 48px);
+  }
+
+  .contact h2 {
+    font-size: clamp(26px, 3.2vw, 34px);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .contact-email {
+    font-size: clamp(17px, 2vw, 20px);
+    text-decoration: none;
+    padding: 6px 0;
+    overflow-wrap: anywhere;
+  }
+
+  .contact p.contact-note {
+    font-size: 15px;
+    color: var(--td-muted);
   }
 </style>

@@ -4,6 +4,8 @@ import { defineConfig, envField } from "astro/config";
 // https://astro.build/config
 export default defineConfig({
   site: "https://traveldot.app",
+  // The privacy copy uses straight quotes, as in the design.
+  markdown: { smartypants: false },
   env: {
     schema: {
       PUBLIC_TURNSTILE_SITE_KEY: envField.string({ context: "client", access: "public" }),

@@ -1,29 +1,61 @@
 :root {
-  --snow: #eef1f2;
-  --surface: #ffffff;
-  --ink: #1b232b;
-  --asphalt: #4a5560;
-  --line: #cfd6db;
-  --route: #1f4fa3;
-  --route-ink: #ffffff;
+  color-scheme: dark;
+  --color-bg: #161826;
+  --color-surface: #232532;
+  --color-text: #e9e9ed;
+  --color-divider: color-mix(in srgb, #e9e9ed 16%, transparent);
+  --color-accent: #2bc6e0;
+  --td-dot: #2bc6e0;
+  --td-muted: #9397ab;
+  --td-soft: #b2b6ca;
+  --td-rule: rgba(43, 198, 224, 0.32);
+  --td-glow: color-mix(in srgb, #2bc6e0 12%, transparent);
+  --shadow-sm: 0 0 0 1px #3f424d;
+  --shadow-md: 0 0 0 1px #595d6c, 0 6px 18px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 0 0 1px #9397ab, 0 16px 40px rgba(0, 0, 0, 0.65);
 
-  --font: "Overpass Variable", system-ui, sans-serif;
-  --gutter: 1rem;
-  --wrap: 68rem;
-  --measure: 38rem;
-
-  color-scheme: light dark;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --font-body: "Inter Variable", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  --page-max: 1180px;
+  --gutter: clamp(20px, 5vw, 56px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --snow: #12181d;
-    --surface: #1a2229;
-    --ink: #e7ecef;
-    --asphalt: #9ba7b1;
-    --line: #2c3842;
-    --route: #8fb0ff;
-    --route-ink: #0d1a33;
+/* Light follows the system unless data-theme on <html> says otherwise. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-bg: #eceef2;
+  --color-surface: #f7f8fa;
+  --color-text: #161826;
+  --color-divider: color-mix(in srgb, #161826 14%, transparent);
+  --color-accent: #0a7488;
+  --td-dot: #0e8fa6;
+  --td-muted: #595d6c;
+  --td-soft: #3f424d;
+  --td-rule: rgba(10, 116, 136, 0.28);
+  --td-glow: color-mix(in srgb, #0e8fa6 10%, transparent);
+  --shadow-sm: 0 0 0 1px rgba(22, 24, 38, 0.1), 0 1px 2px rgba(22, 24, 38, 0.05);
+  --shadow-md: 0 0 0 1px rgba(22, 24, 38, 0.09), 0 12px 32px rgba(22, 24, 38, 0.08);
+  --shadow-lg: 0 0 0 1px rgba(22, 24, 38, 0.12), 0 18px 44px rgba(22, 24, 38, 0.12);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --color-bg: #eceef2;
+    --color-surface: #f7f8fa;
+    --color-text: #161826;
+    --color-divider: color-mix(in srgb, #161826 14%, transparent);
+    --color-accent: #0a7488;
+    --td-dot: #0e8fa6;
+    --td-muted: #595d6c;
+    --td-soft: #3f424d;
+    --td-rule: rgba(10, 116, 136, 0.28);
+    --td-glow: color-mix(in srgb, #0e8fa6 10%, transparent);
+    --shadow-sm: 0 0 0 1px rgba(22, 24, 38, 0.1), 0 1px 2px rgba(22, 24, 38, 0.05);
+    --shadow-md: 0 0 0 1px rgba(22, 24, 38, 0.09), 0 12px 32px rgba(22, 24, 38, 0.08);
+    --shadow-lg: 0 0 0 1px rgba(22, 24, 38, 0.12), 0 18px 44px rgba(22, 24, 38, 0.12);
   }
 }
 
@@ -33,74 +65,188 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   margin: 0;
-  background: var(--snow);
-  color: var(--ink);
-  font-family: var(--font);
-  font-size: 1.0625rem;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 15px;
   line-height: 1.55;
-  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
-h2 {
-  line-height: 1.1;
-  margin: 0 0 0.75rem;
-}
-
-h1 {
-  font-size: clamp(2.5rem, 7vw, 4.25rem);
-  font-weight: 800;
-  letter-spacing: -0.025em;
-}
-
-h2 {
-  font-size: 1.625rem;
-  font-weight: 750;
-  letter-spacing: -0.01em;
+h2,
+h3 {
+  font-weight: 500;
+  margin: 0;
 }
 
 p {
-  margin: 0 0 1rem;
+  margin: 0;
 }
 
 a {
-  color: var(--route);
-  text-underline-offset: 0.15em;
+  color: var(--color-accent);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--color-text);
+}
+
+:focus {
+  outline: none;
 }
 
 :focus-visible {
-  outline: 3px solid var(--route);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
 .wrap {
-  max-width: var(--wrap);
-  margin-inline: auto;
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
   padding-inline: var(--gutter);
 }
 
-.prose {
-  max-width: var(--measure);
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--td-muted);
 }
 
-.button {
-  display: inline-block;
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* Freestanding rules fade out at both ends. */
+.rule {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-divider) 48px,
+    var(--color-divider) calc(100% - 48px),
+    transparent
+  );
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px;
   font: inherit;
-  font-weight: 700;
-  padding: 0.7rem 1.25rem;
-  border: 0;
-  border-radius: 0.375rem;
-  background: var(--route);
-  color: var(--route-ink);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--color-text);
   text-decoration: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
   cursor: pointer;
 }
 
-.button:disabled {
-  opacity: 0.6;
-  cursor: progress;
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary,
+.btn-primary:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.btn-primary:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+.btn-primary:active {
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+.btn-secondary {
+  border-color: var(--color-divider);
+}
+
+.btn-secondary:hover {
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+}
+
+.btn-secondary:active {
+  background: color-mix(in srgb, var(--color-text) 14%, transparent);
+}
+
+.btn-ghost,
+.btn-ghost:hover {
+  color: var(--color-accent);
+  padding-inline: 2.8px;
+}
+
+.btn-ghost:hover {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 16px;
+  color: var(--color-text);
+  caret-color: var(--color-accent);
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-md);
+}
+
+.input:hover {
+  border-color: color-mix(in srgb, var(--color-text) 45%, transparent);
+}
+
+.input:focus-visible {
+  border-color: var(--color-accent);
+  outline-offset: 0;
+}
+
+.icon {
+  display: inline-block;
+  height: 1em;
+  width: auto;
+  flex: none;
+  vertical-align: -0.125em;
+  fill: currentColor;
 }
 
 .visually-hidden {

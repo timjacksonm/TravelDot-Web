@@ -1,45 +1,55 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import StatusLayout from "../../layouts/StatusLayout.astro";
 ---
 
-<BaseLayout title="Unsubscribe" description="Leave the TravelDot waitlist." noindex>
-  <section class="wrap">
-    <div class="prose">
-      <div data-view="ask" tabindex="-1">
-        <h1>Unsubscribe from the waitlist</h1>
-        <p>You'll stop getting TravelDot waitlist emails, including the launch announcement.</p>
-        <button class="button" type="button" data-unsubscribe>
-          Unsubscribe
-        </button>
-        <p class="status" role="status"></p>
-        <noscript>
-          <p>This page needs JavaScript turned on to unsubscribe.</p>
-        </noscript>
-      </div>
-
-      <div data-view="done" tabindex="-1" hidden>
-        <h1>You're unsubscribed</h1>
-        <p>You won't get any more waitlist emails.</p>
-      </div>
-
-      <div data-view="invalid" tabindex="-1" hidden>
-        <h1>This link doesn't work</h1>
-        <p>
-          It may have expired. Email{" "}
-          <a href="mailto:support@traveldot.app">support@traveldot.app</a>
-          and we'll take you off the list.
-        </p>
-      </div>
+<StatusLayout title="Unsubscribe" description="Leave the TravelDot waitlist.">
+  <div class="status" data-view="ask" tabindex="-1">
+    <div class="kicker">Email preferences</div>
+    <h1>Leave the waitlist?</h1>
+    <p class="status-lede">You'll stop getting emails about TravelDot.</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" type="button" data-unsubscribe>
+        Unsubscribe
+      </button>
+      <a class="btn btn-secondary" href="/">
+        Stay on the list
+      </a>
     </div>
-  </section>
-</BaseLayout>
+    <p class="status-error" role="status" data-status></p>
+    <noscript>
+      <p class="status-note">This page needs JavaScript turned on to unsubscribe.</p>
+    </noscript>
+  </div>
+
+  <div class="status" data-view="done" tabindex="-1" hidden>
+    <div class="kicker">Unsubscribed</div>
+    <h1>You're off the list.</h1>
+    <p class="status-lede">We won't email you about TravelDot again.</p>
+    <p class="status-note">Changed your mind? You can rejoin from the home page.</p>
+    <div class="btn-row">
+      <a class="btn btn-secondary" href="/#waitlist">
+        Rejoin the waitlist
+      </a>
+    </div>
+  </div>
+
+  <div class="status" data-view="invalid" tabindex="-1" hidden>
+    <div class="kicker">Email preferences</div>
+    <h1>Use the link in your email.</h1>
+    <p class="status-lede">
+      Every TravelDot email has an unsubscribe link at the bottom. If yours doesn't work, write to{" "}
+      <a href="mailto:support@traveldot.app">support@traveldot.app</a> and we'll take you off the
+      list.
+    </p>
+  </div>
+</StatusLayout>
 
 <script>
   import { postToApi } from "../../lib/api";
   import { showView, tokenFromUrl } from "../../lib/views";
 
   const button = document.querySelector<HTMLButtonElement>("[data-unsubscribe]")!;
-  const status = document.querySelector<HTMLElement>(".status")!;
+  const status = document.querySelector<HTMLElement>("[data-status]")!;
   const token = tokenFromUrl();
 
   if (!token) showView("invalid");
@@ -47,7 +57,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   // Only a click unsubscribes, because mail scanners open every link in an email.
   button.addEventListener("click", async () => {
     button.disabled = true;
-    status.textContent = "Unsubscribing…";
+    status.textContent = "";
     const code = await postToApi(
       `/api/waitlist/unsubscribe?token=${encodeURIComponent(token ?? "")}`,
     );
@@ -58,18 +68,3 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     button.disabled = false;
   });
 </script>
-
-<style>
-  section {
-    padding-top: 2.5rem;
-  }
-
-  [data-view]:focus {
-    outline: none;
-  }
-
-  .status {
-    margin-top: 1rem;
-    color: var(--asphalt);
-  }
-</style>

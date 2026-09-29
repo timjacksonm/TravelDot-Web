@@ -1,0 +1,138 @@
+<figure class="map">
+  <svg
+    viewBox="0 0 100 100"
+    width="100%"
+    role="img"
+    aria-label="Map of Minnesota, zooming in to the Mesabi Iron Range, where a route line follows US-169 from Grand Rapids through Hibbing and Chisholm to Virginia."
+    data-map
+  >
+    <path
+      d="M9.9,9.5L31.2,10.0L31.3,4.0L33.3,4.2L34.6,5.4L35.9,13.5L37.5,14.7L44.8,15.9L45.2,17.6L48.6,17.1L49.8,15.8L53.5,15.8L57.2,17.0L56.4,18.3L58.5,18.5L60.1,22.0L61.0,21.6L61.1,19.9L63.3,19.8L64.5,21.8L66.9,22.2L67.0,23.5L68.6,23.5L68.5,24.5L71.8,23.8L75.5,21.1L76.9,23.4L83.4,22.8L86.2,24.7L90.2,24.0L77.5,30.7L63.5,44.3L64.4,45.6L63.6,44.9L62.3,46.5L61.4,46.3L61.7,55.5L57.9,57.8L55.6,61.1L55.4,63.4L57.2,63.9L58.1,65.5L56.4,71.5L57.1,73.4L56.7,76.5L59.5,79.1L62.0,79.4L63.0,80.9L65.9,82.1L67.1,84.6L70.5,87.3L72.1,87.6L74.4,91.1L74.9,95.3L15.5,95.6L16.3,67.5L13.8,65.7L12.0,62.6L15.1,59.3L15.5,55.7L15.1,51.4L13.2,46.6L13.7,41.9L13.1,41.4L13.0,31.3L10.4,23.0L10.3,16.6L11.1,14.4L9.8,10.0Z"
+      fill="currentColor"
+      fill-opacity=".04"
+      stroke="currentColor"
+      stroke-opacity=".38"
+      stroke-width="1"
+      vector-effect="non-scaling-stroke"
+      stroke-linejoin="round"
+    ></path>
+    <g class="detail" data-map-detail>
+      <path
+        d="M48.3 37.3 L49.33 36.56 L49.95 36.25 L50.88 36.09 L52.02 35.16 L53.06 34.84 L54.41 34.38 L54.6 33.9 L55.03 33.44 L56.07 33.44 L57.73 32.82 L58.56 32.97"
+        fill="none"
+        stroke-width="2.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        style="stroke:var(--td-dot)"
+        stroke-opacity=".14"
+      ></path>
+      <text
+        x="53.6"
+        y="40.2"
+        text-anchor="middle"
+        font-size="1.2"
+        font-weight="500"
+        letter-spacing=".24"
+        style="fill:var(--color-accent)"
+      >
+        IRON RANGE
+      </text>
+      <g font-size="1.3" fill="currentColor" fill-opacity=".75">
+        <text x="46.9" y="37.75" text-anchor="end">
+          Grand Rapids
+        </text>
+        <text x="55.2" y="35.7">
+          Hibbing
+        </text>
+        <text x="60.3" y="33.45">
+          Virginia
+        </text>
+      </g>
+    </g>
+    <path
+      d="M48.91 36.86 L49.33 36.56 L49.95 36.25 L50.88 36.09 L52.02 35.16 L53.06 34.84 L54.41 34.38 L54.6 33.9 L55.03 33.44 L56.07 33.44 L57.73 32.82 L57.8 32.83"
+      fill="none"
+      stroke="currentColor"
+      stroke-opacity=".6"
+      stroke-width="1.5"
+      vector-effect="non-scaling-stroke"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    ></path>
+    <circle cx="54.41" cy="34.38" r=".35" fill="currentColor" fill-opacity=".7"></circle>
+    <circle
+      cx="48.3"
+      cy="37.3"
+      r=".75"
+      stroke="currentColor"
+      stroke-width="3"
+      vector-effect="non-scaling-stroke"
+      style="fill:var(--color-bg)"
+    ></circle>
+    <circle cx="58.56" cy="32.97" r="1.25" style="fill:var(--td-dot)" fill-opacity=".18"></circle>
+    <circle cx="58.56" cy="32.97" r=".85" style="fill:var(--td-dot)"></circle>
+  </svg>
+</figure>
+
+<script>
+  const svg = document.querySelector<SVGSVGElement>("[data-map]")!;
+  const detail = svg.querySelector<SVGGElement>("[data-map-detail]")!;
+  const from = [0, 0, 100, 100];
+  const to = [31.5, 13, 44, 44];
+
+  // t runs 0 to 1: the full state to the Iron Range close-up.
+  function paint(t: number) {
+    const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    svg.setAttribute("viewBox", from.map((v, i) => (v + (to[i] - v) * ease).toFixed(3)).join(" "));
+    detail.style.opacity = Math.max(0, Math.min(1, (t - 0.45) / 0.45)).toFixed(3);
+    // Feather the crop as it tightens. At t=0 the mask sits past the corners.
+    const inner = (100 - 38 * ease).toFixed(1);
+    const outer = (142 - 42 * ease).toFixed(1);
+    const mask = `radial-gradient(closest-side, #000 ${inner}%, transparent ${outer}%)`;
+    svg.style.maskImage = mask;
+  }
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    paint(1);
+  } else {
+    paint(0);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        setTimeout(() => {
+          const start = performance.now();
+          const step = (now: number) => {
+            const t = Math.min(1, (now - start) / 2800);
+            paint(t);
+            if (t < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        }, 500);
+      },
+      { threshold: 0.5 },
+    );
+    observer.observe(svg);
+  }
+</script>
+
+<style>
+  .map {
+    margin: 0;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  svg {
+    max-width: 400px;
+    display: block;
+    aspect-ratio: 1 / 1;
+    color: var(--color-text);
+  }
+
+  .detail {
+    opacity: 0;
+    font-family: var(--font-mono);
+  }
+</style>

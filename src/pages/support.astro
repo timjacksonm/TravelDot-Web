@@ -1,24 +1,200 @@
 ---
-import ProseLayout from "../layouts/ProseLayout.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
 
-const frontmatter = {
-  title: "Support",
-  description: "How to reach TravelDot for help with the app or the waitlist.",
-};
+const faqs = [
+  {
+    q: "When does TravelDot launch?",
+    a: `We're not announcing a date yet. Join the <a href="/#waitlist">waitlist</a> and we'll email you when it's ready to download.`,
+    open: true,
+  },
+  { q: "Which phones will it work on?", a: "iPhone and Android." },
+  {
+    q: "What does a trip check show?",
+    a: "Road conditions like ice, compacted snow and low visibility; incidents like crashes and stalled vehicles; advisories like closures and detours; and weather along the route. Each one shows the mile it starts at, the direction it affects, and when the data was last updated — plus a plain-language summary of the whole drive.",
+  },
+  {
+    q: "Will it tell me whether I should drive?",
+    a: "No. TravelDot shows what's been reported along your route. It doesn't rate conditions, score your trip or tell you whether to go. That call stays with you.",
+  },
+  {
+    q: "Where does the information come from?",
+    a: "From official road and weather reporting. Every item in a trip check shows when it was last updated, so you can see how current it is.",
+  },
+  {
+    q: "Does it work outside Minnesota?",
+    a: "Not yet. TravelDot covers all of Minnesota at launch.",
+  },
+  {
+    q: "How do I leave the waitlist?",
+    a: "Use the unsubscribe link at the bottom of any email from us. If you can't find one, write to us and we'll remove you.",
+  },
+];
 ---
 
-<ProseLayout frontmatter={frontmatter}>
-  <p>
-    Email <a href="mailto:support@traveldot.app">support@traveldot.app</a> with questions about the
-    app or the waitlist.
-  </p>
+<BaseLayout
+  title="Support"
+  description="Answers about TravelDot, the launch and the waitlist."
+  current="support"
+>
+  <main class="wrap">
+    <div class="content">
+      <div class="intro">
+        <div class="kicker">Support</div>
+        <h1>Answers before launch.</h1>
+        <p>
+          TravelDot isn't in the App Store or Google Play yet, so most questions right now are about
+          the launch and the waitlist.
+        </p>
+      </div>
 
-  <h2>If something in the app looks wrong</h2>
-  <p>
-    Tell us where your trip started and ended, and roughly when you checked it. That's enough for us
-    to find what the app showed you.
-  </p>
+      <div class="faqs">
+        <div class="rule"></div>
+        {faqs.map((faq) => (
+          <>
+            <details open={faq.open}>
+              <summary>
+                {faq.q}
+                <Icon name="ph-caret-down" class="caret" />
+              </summary>
+              <p set:html={faq.a} />
+            </details>
+            <div class="rule" />
+          </>
+        ))}
+      </div>
 
-  <h2>Leaving the waitlist</h2>
-  <p>Every waitlist email has an unsubscribe link at the bottom.</p>
-</ProseLayout>
+      <div class="ask">
+        <div class="ask-text">
+          <div class="ask-title">Still have a question?</div>
+          <div class="ask-sub">
+            Write to <span class="mono">support@traveldot.app</span>
+          </div>
+        </div>
+        <a class="btn btn-primary" href="mailto:support@traveldot.app">
+          <Icon name="ph-envelope" class="ask-icon" />
+          Email support
+        </a>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  main {
+    flex: 1;
+    padding-top: clamp(28px, 6vw, 72px);
+    padding-bottom: 24px;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    max-width: 760px;
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  h1 {
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+
+  .intro p {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--td-soft);
+    text-wrap: pretty;
+  }
+
+  .faqs {
+    display: flex;
+    flex-direction: column;
+  }
+
+  summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 0;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary :global(.caret) {
+    font-size: 18px;
+    color: var(--td-muted);
+    transition: transform 0.2s;
+  }
+
+  details[open] summary :global(.caret) {
+    transform: rotate(180deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    summary :global(.caret) {
+      transition: none;
+    }
+  }
+
+  details p {
+    padding: 0 0 22px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--td-soft);
+    max-width: 40em;
+  }
+
+  .ask {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+    padding: 22px 24px;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .ask-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .ask-title {
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .ask-sub {
+    font-size: 15px;
+    color: var(--td-soft);
+    overflow-wrap: anywhere;
+  }
+
+  .ask-sub .mono {
+    font-size: 14px;
+    color: var(--color-text);
+  }
+
+  .ask :global(.ask-icon) {
+    font-size: 17px;
+  }
+</style>

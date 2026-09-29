@@ -1,0 +1,50 @@
+---
+// The 16b lockup with live text; the page's self-hosted Inter and JetBrains Mono render it.
+interface Props {
+  width: number;
+}
+
+const { width } = Astro.props;
+const height = Math.round((width * 98) / 278);
+---
+
+<svg width={width} height={height} viewBox="30 16 278 98" fill="none" aria-hidden="true">
+  <text
+    x="52"
+    y="61"
+    font-family="'Inter Variable', system-ui, sans-serif"
+    font-size="54"
+    font-weight="600"
+    letter-spacing="-2.43"
+    fill="currentColor"
+  >
+    TravelDot
+  </text>
+  <text
+    x="53"
+    y="106"
+    font-family="'JetBrains Mono Variable', ui-monospace, monospace"
+    font-size="14"
+    font-weight="500"
+    letter-spacing="2.8"
+    style="fill:var(--td-muted)"
+  >
+    KNOW BEFORE YOU GO
+  </text>
+  <path
+    d="M39 95 C39 88, 44 80, 52 80 L 270 80 C 285 80, 295 78, 295 62"
+    stroke="currentColor"
+    stroke-width="3.5"
+    stroke-opacity=".55"
+    stroke-linecap="round"
+  ></path>
+  <circle
+    cx="39"
+    cy="104"
+    r="7"
+    stroke="currentColor"
+    stroke-width="4"
+    style="fill:var(--color-bg)"
+  ></circle>
+  <circle cx="295" cy="53.5" r="7.5" style="fill:var(--td-dot)"></circle>
+</svg>

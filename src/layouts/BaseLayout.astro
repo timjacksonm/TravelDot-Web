@@ -1,18 +1,24 @@
 ---
-import "@fontsource-variable/overpass";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
 import "../styles/global.css";
+import Lockup from "../components/Lockup.astro";
 
 interface Props {
-  // Page name for the browser tab, e.g. "Privacy". Omit on the home page.
+  // Page name for the browser tab, e.g. "Privacy". The home page passes the full title instead.
   title?: string;
+  fullTitle?: string;
   description: string;
+  current?: "home" | "support" | "other";
+  glow?: "home" | "page";
   // Token pages and the 404 have nothing worth indexing.
   noindex?: boolean;
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, fullTitle, description, current = "other", glow, noindex = false } = Astro.props;
 
-const pageTitle = title ? `${title} · TravelDot` : "TravelDot";
+const pageTitle = fullTitle ?? (title ? `${title} · TravelDot` : "TravelDot");
+const waitlistHref = current === "home" ? "#waitlist" : "/#waitlist";
 const year = new Date().getFullYear();
 ---
 
@@ -26,71 +32,142 @@ const year = new Date().getFullYear();
     {noindex && <meta name="robots" content="noindex" />}
   </head>
   <body>
-    <header class="wrap site-header">
-      <a class="wordmark" href="/">
-        <span class="dot" aria-hidden="true"></span>TravelDot
-      </a>
-    </header>
-    <main>
-      <slot />
-    </main>
-    <footer class="wrap">
-      <div class="site-footer">
-        <nav aria-label="Site">
-          <a href="/support">Support</a>
-          <a href="/privacy">Privacy</a>
+    <div class:list={["page", glow && `glow-${glow}`]}>
+      <header class="site-header wrap">
+        <a class="brand" href="/" aria-label="TravelDot home">
+          <Lockup width={190} />
+        </a>
+        <nav class="header-nav" aria-label="Main">
+          <a
+            class="nav-link"
+            href="/support"
+            aria-current={current === "support" ? "page" : undefined}
+          >
+            Support
+          </a>
+          <a class="btn btn-primary" href={waitlistHref}>
+            Join the waitlist
+          </a>
         </nav>
-        <p>© {year} TravelDot</p>
-      </div>
-    </footer>
+      </header>
+
+      <slot />
+
+      <footer class="site-footer wrap">
+        <div class="rule"></div>
+        <div class="footer-main">
+          <a class="brand" href="/" aria-label="TravelDot home">
+            <Lockup width={170} />
+          </a>
+          <nav class="footer-nav" aria-label="Footer">
+            <a href="/support">Support</a>
+            <a href="/privacy">Privacy</a>
+            <a href={waitlistHref}>Waitlist</a>
+          </nav>
+        </div>
+        <div class="footer-meta">
+          <span>© {year} TravelDot · traveldot.app</span>
+          <span>Coming to iPhone and Android</span>
+        </div>
+      </footer>
+    </div>
   </body>
 </html>
 
 <style>
-  .site-header {
-    padding-block: 1.25rem;
+  .page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg);
   }
 
-  .wordmark {
-    display: inline-flex;
+  .glow-home {
+    background:
+      radial-gradient(900px 560px at 12% -10%, var(--td-glow), transparent 70%), var(--color-bg);
+  }
+
+  .glow-page {
+    background:
+      radial-gradient(800px 480px at 10% 0%, var(--td-glow), transparent 70%), var(--color-bg);
+  }
+
+  .site-header {
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-weight: 800;
-    font-size: 1.25rem;
-    letter-spacing: -0.01em;
-    color: var(--ink);
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-block: 18px;
+  }
+
+  .brand {
+    display: flex;
+    color: var(--color-text);
     text-decoration: none;
   }
 
-  .dot {
-    width: 0.8rem;
-    height: 0.8rem;
-    border-radius: 50%;
-    background: var(--route);
+  .site-header .brand {
+    padding: 6px 0;
   }
 
-  main {
-    min-height: 60vh;
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+
+  .nav-link {
+    color: inherit;
+    text-decoration: none;
+    font-size: 15px;
+    padding: 10px 0;
+  }
+
+  .nav-link:hover,
+  .nav-link[aria-current="page"] {
+    color: var(--color-accent);
   }
 
   .site-footer {
     display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding-top: 40px;
+    padding-bottom: 36px;
+  }
+
+  .footer-main {
+    display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 1rem;
-    margin-top: 5rem;
-    padding-block: 2rem;
-    border-top: 1px solid var(--line);
-    color: var(--asphalt);
-    font-size: 0.9375rem;
+    align-items: flex-start;
+    gap: 24px;
   }
 
-  .site-footer nav {
+  .footer-nav {
     display: flex;
-    gap: 1.5rem;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    font-size: 15px;
   }
 
-  .site-footer p {
-    margin: 0;
+  .footer-nav a {
+    color: var(--td-soft);
+    text-decoration: none;
+    padding: 8px 0;
+  }
+
+  .footer-nav a:hover {
+    color: var(--color-accent);
+  }
+
+  .footer-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    font-size: 13px;
+    color: var(--td-muted);
   }
 </style>
