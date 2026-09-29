@@ -1,16 +1,36 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const shows = [
+  "Closures and crashes",
+  "Road conditions reported by snowplows",
+  "Weather alerts along your route",
+];
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astro</title>
-  </head>
-  <body>
-    <h1>Astro</h1>
-  </body>
-</html>
+<BaseLayout description="TravelDot checks your Minnesota route for closures, crashes, plow-reported road conditions and weather alerts before you leave.">
+  <h1>Know your road before you go.</h1>
+  <p>
+    Enter where you're starting and where you're headed. TravelDot checks every stretch of the route
+    against live road reports and current weather, then tells you what's on your road in plain
+    language.
+  </p>
+
+  <h2>What it shows</h2>
+  <ul>
+    {shows.map((item) => (
+      <li>{item}</li>
+    ))}
+  </ul>
+  <p>When you're ready to leave, one tap opens the trip in your navigation app.</p>
+
+  <h2>Starting with Minnesota</h2>
+  <p>
+    TravelDot launches in Minnesota and covers the state's interstates, US highways and state
+    highways. County and city roads aren't included. Other states that publish 511 road data may
+    come next.
+  </p>
+
+  <h2 id="waitlist">Coming to iPhone and Android</h2>
+  <p>Join the waitlist and we'll email you when it's out.</p>
+</BaseLayout>

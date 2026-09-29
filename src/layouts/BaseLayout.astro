@@ -1,0 +1,45 @@
+---
+interface Props {
+  // Page name for the browser tab, e.g. "Privacy". Omit on the home page.
+  title?: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+
+const pageTitle = title ? `${title} · TravelDot` : "TravelDot";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: light dark;
+    font-family: system-ui, sans-serif;
+    line-height: 1.5;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  main {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 3rem 1rem;
+  }
+</style>
