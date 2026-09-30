@@ -1,0 +1,268 @@
+---
+import { PUBLIC_TURNSTILE_SITE_KEY } from "astro:env/client";
+import Icon from "./Icon.astro";
+---
+
+<div id="waitlist" class="waitlist" data-waitlist>
+  <form novalidate>
+    <label for="td-email">Get an email when TravelDot launches</label>
+    <div class="row">
+      <input
+        id="td-email"
+        class="input"
+        name="email"
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        placeholder="you@example.com"
+        aria-describedby="td-email-note"
+      />
+      <button class="btn btn-primary" type="submit">
+        Join the waitlist
+      </button>
+    </div>
+    <div
+      class="cf-turnstile"
+      data-sitekey={PUBLIC_TURNSTILE_SITE_KEY}
+      data-action="waitlist"
+      data-appearance="interaction-only"
+    ></div>
+    <div id="td-email-error" class="error" role="alert" hidden>
+      <Icon name="ph-info" />
+      <span data-error-text></span>
+    </div>
+    <div id="td-email-note" class="note">
+      We'll only email you about TravelDot. Unsubscribe anytime.
+    </div>
+  </form>
+
+  <div class="success" role="status" hidden>
+    <Icon name="ph-envelope" />
+    <div class="success-body">
+      <div class="success-title">Thanks! Check your inbox to confirm.</div>
+      <div class="success-text">
+        Look for an email from TravelDot sent to <span class="mono" data-email></span>. Already
+        confirmed? You're all set.
+      </div>
+      <button class="btn btn-ghost" type="button" data-reset>
+        Use a different email
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<script>
+  import { postToApi } from "../lib/api";
+
+  const root = document.querySelector<HTMLElement>("[data-waitlist]")!;
+  const form = root.querySelector("form")!;
+  const input = form.querySelector("input")!;
+  const button = form.querySelector<HTMLButtonElement>("button[type=submit]")!;
+  const widget = form.querySelector<HTMLElement>(".cf-turnstile")!;
+  const error = form.querySelector<HTMLElement>(".error")!;
+  const errorText = error.querySelector<HTMLElement>("[data-error-text]")!;
+  const success = root.querySelector<HTMLElement>(".success")!;
+
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const messages: Record<number, string> = {
+    400: "That didn't go through. Check the email address and try again.",
+    429: "Too many signups from this network. Try again in an hour.",
+  };
+  const unreachable = "The waitlist isn't reachable right now. Try again in a few minutes.";
+
+  function showError(message: string, invalid = false) {
+    errorText.textContent = message;
+    error.hidden = false;
+    input.setAttribute("aria-invalid", String(invalid));
+    input.setAttribute("aria-describedby", "td-email-error td-email-note");
+  }
+
+  function clearError() {
+    error.hidden = true;
+    input.removeAttribute("aria-invalid");
+    input.setAttribute("aria-describedby", "td-email-note");
+  }
+
+  input.addEventListener("input", clearError);
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const email = input.value.trim();
+
+    if (!EMAIL.test(email)) {
+      showError("That doesn't look like an email address. Check it and try again.", true);
+      input.focus();
+      return;
+    }
+
+    const turnstileToken = String(new FormData(form).get("cf-turnstile-response") ?? "");
+    if (!turnstileToken) {
+      showError("Still running a quick spam check. Try again in a moment.");
+      return;
+    }
+
+    clearError();
+    button.disabled = true;
+    const code = await postToApi("/api/waitlist", { email, turnstileToken });
+    button.disabled = false;
+
+    // Turnstile tokens are single-use, so every attempt needs a fresh one.
+    window.turnstile?.reset(widget);
+
+    if (code === 202) {
+      success.querySelector("[data-email]")!.textContent = email;
+      form.hidden = true;
+      success.hidden = false;
+      return;
+    }
+
+    showError(messages[code] ?? unreachable);
+  });
+
+  root.querySelector("[data-reset]")!.addEventListener("click", () => {
+    form.reset();
+    clearError();
+    success.hidden = true;
+    form.hidden = false;
+    input.focus();
+  });
+
+  // Waitlist links scroll as high up the page as possible while keeping the whole form on screen.
+  function scrollToForm(behavior: ScrollBehavior = "auto") {
+    const formBottom = root.getBoundingClientRect().bottom + window.scrollY;
+    window.scrollTo({ top: Math.max(0, formBottom + 24 - window.innerHeight), behavior });
+  }
+
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('a[href="#waitlist"]')) {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      history.replaceState(null, "", "#waitlist");
+      scrollToForm();
+      input.focus({ preventScroll: true });
+    });
+  }
+
+  // Arriving at /#waitlist: wait for the browser's own jump to the anchor, then adjust it.
+  window.addEventListener("load", () => {
+    if (location.hash === "#waitlist") scrollToForm("instant");
+  });
+</script>
+
+<style>
+  .waitlist {
+    scroll-margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 500px;
+    margin-top: 12px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  form[hidden],
+  .success[hidden],
+  .error[hidden] {
+    display: none;
+  }
+
+  label {
+    font-size: 14px;
+    color: var(--td-soft);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .input {
+    flex: 1 1 220px;
+    min-width: 0;
+    width: auto;
+  }
+
+  .row .btn {
+    flex: 0 0 auto;
+    min-height: 46px;
+    padding: 0 18px;
+  }
+
+  /* The widget is usually invisible; cancel its flex gap so it takes no space. */
+  .cf-turnstile {
+    margin-bottom: -10px;
+  }
+
+  .error {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .error .icon {
+    font-size: 18px;
+    margin-top: 1px;
+    color: var(--color-accent);
+  }
+
+  .note {
+    font-size: 13px;
+    color: var(--td-muted);
+  }
+
+  .success {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 18px 20px;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .success > .icon {
+    font-size: 22px;
+    margin-top: 1px;
+    color: var(--color-accent);
+  }
+
+  .success-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .success-title {
+    font-size: 17px;
+    font-weight: 500;
+  }
+
+  .success-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--td-soft);
+    overflow-wrap: anywhere;
+  }
+
+  .success-text .mono {
+    font-size: 14px;
+    color: var(--color-text);
+  }
+
+  .success .btn-ghost {
+    align-self: flex-start;
+    margin-top: 6px;
+    font-size: 14px;
+    min-height: 36px;
+  }
+</style>

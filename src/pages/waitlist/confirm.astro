@@ -1,0 +1,89 @@
+---
+import StatusLayout from "../../layouts/StatusLayout.astro";
+import RouteOrnament from "../../components/RouteOrnament.astro";
+---
+
+<StatusLayout
+  title="You're on the list"
+  description="Confirm your spot on the TravelDot waitlist."
+  glow="page"
+>
+  <div class="status" data-view="pending" tabindex="-1">
+    <div class="kicker">Confirming your email</div>
+    <h1>One moment.</h1>
+    <p class="status-lede">We're confirming your spot on the waitlist.</p>
+    <noscript>
+      <p class="status-note">This page needs JavaScript turned on to confirm your email.</p>
+    </noscript>
+  </div>
+
+  <div class="status" data-view="done" tabindex="-1" hidden>
+    <RouteOrnament variant="arrived" />
+    <div class="kicker">Email confirmed</div>
+    <h1>You're on the waitlist.</h1>
+    <p class="status-lede">
+      Thanks for confirming. We'll email you when TravelDot is ready to download for iPhone and
+      Android.
+    </p>
+    <p class="status-note">
+      Know someone who drives the Iron Range? Send them to <span class="mono">traveldot.app</span>.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="/">
+        Back to TravelDot
+      </a>
+      <a class="btn btn-secondary" href="/support">
+        Questions and answers
+      </a>
+    </div>
+  </div>
+
+  <div class="status" data-view="invalid" tabindex="-1" hidden>
+    <RouteOrnament variant="dead-end" />
+    <div class="kicker">Link expired</div>
+    <h1>This link doesn't work anymore.</h1>
+    <p class="status-lede">
+      It may have expired. Join the waitlist again and we'll send you a new confirmation link.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="/#waitlist">
+        Join the waitlist
+      </a>
+      <a class="btn btn-secondary" href="/support">
+        Support
+      </a>
+    </div>
+  </div>
+
+  <div class="status" data-view="error" tabindex="-1" hidden>
+    <RouteOrnament variant="dead-end" />
+    <div class="kicker">Not confirmed yet</div>
+    <h1>Your email isn't confirmed yet.</h1>
+    <p class="status-lede">
+      The waitlist isn't reachable right now. Reload this page in a few minutes to try again.
+    </p>
+    <div class="btn-row">
+      <button class="btn btn-primary" type="button" data-reload>
+        Reload
+      </button>
+    </div>
+  </div>
+</StatusLayout>
+
+<script>
+  import { postToApi } from "../../lib/api";
+  import { showView, tokenFromUrl } from "../../lib/views";
+
+  document.querySelector("[data-reload]")!.addEventListener("click", () => location.reload());
+
+  // Posting on load is safe because the email links to this page, not the API, and mail
+  // scanners don't run JavaScript.
+  const token = tokenFromUrl();
+  if (!token) {
+    showView("invalid");
+  } else {
+    postToApi("/api/waitlist/confirm", { token }).then((code) =>
+      showView(code === 204 ? "done" : code === 404 ? "invalid" : "error"),
+    );
+  }
+</script>

@@ -27,3 +27,6 @@ pnpm-debug.log*
 # Claude Code config stays local; this repo is public
 .claude/
 CLAUDE.md
+
+# Wrangler local state
+.wrangler/

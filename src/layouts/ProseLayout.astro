@@ -1,0 +1,99 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+// Markdown pages (the privacy policy) pass their frontmatter here.
+interface Props {
+  frontmatter: {
+    title: string;
+    description: string;
+    kicker?: string;
+    updated?: string;
+    lede?: string;
+  };
+}
+
+const { title, description, kicker = "Privacy", updated, lede } = Astro.props.frontmatter;
+---
+
+<BaseLayout title={title} description={description}>
+  <main class="wrap">
+    <article>
+      <div class="intro">
+        <div class="kicker">{kicker}</div>
+        <h1>{title}</h1>
+        {updated && <div class="mono updated">Last updated {updated}</div>}
+        {lede && <p class="lede">{lede}</p>}
+      </div>
+      <div class="rule"></div>
+      <div class="body">
+        <slot />
+      </div>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  main {
+    flex: 1;
+    padding-top: clamp(28px, 6vw, 72px);
+    padding-bottom: 24px;
+  }
+
+  article {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    max-width: 720px;
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  h1 {
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+
+  .updated {
+    font-size: 13px;
+    color: var(--td-muted);
+  }
+
+  .lede {
+    margin-top: 6px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--td-soft);
+    text-wrap: pretty;
+  }
+
+  /* Markdown output isn't part of this component, so its styles need :global. */
+  .body :global(h2) {
+    margin: 40px 0 10px;
+    font-size: 22px;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+  }
+
+  .body :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .body :global(p) {
+    margin: 0 0 10px;
+  }
+
+  .body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .body :global(p) {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--td-soft);
+  }
+</style>

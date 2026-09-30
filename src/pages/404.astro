@@ -1,0 +1,23 @@
+---
+import StatusLayout from "../layouts/StatusLayout.astro";
+import RouteOrnament from "../components/RouteOrnament.astro";
+---
+
+<StatusLayout title="Page not found" description="There's no page at this address.">
+  <div class="status">
+    <RouteOrnament variant="dead-end" />
+    <div class="kicker">404 · Page not found</div>
+    <h1>This route doesn't go anywhere.</h1>
+    <p class="status-lede">
+      There's nothing at this address. The link may be old, or there's a typo in it.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="/">
+        Go to the home page
+      </a>
+      <a class="btn btn-secondary" href="/support">
+        Support
+      </a>
+    </div>
+  </div>
+</StatusLayout>

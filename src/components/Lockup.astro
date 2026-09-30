@@ -1,0 +1,73 @@
+---
+// The brand kit's outlined lockups. Live text renders wide enough in other builds of Inter to crowd
+// the period, and the dark version has heavier strokes, so each theme gets its own file.
+interface Props {
+  // Width of the visible logo. The artboard carries padding, which the frame crops off.
+  width: number;
+}
+
+const { width } = Astro.props;
+
+// The artboard is 335 x 120. The crop spans x 28–308 and y 16–114, clear of the dark dot at x 29.
+const scale = width / 280;
+const frame = { width, height: Math.round(98 * scale) };
+const image = {
+  width: Math.round(335 * scale),
+  height: Math.round(120 * scale),
+  left: -28 * scale,
+  top: -16 * scale,
+};
+---
+
+<span
+  class="lockup"
+  style={`width:${frame.width}px; height:${frame.height}px; --left:${image.left}px; --top:${image.top}px`}
+>
+  {(["light", "dark"] as const).map((ground) => (
+    <img
+      class={`lockup-${ground}`}
+      src={`/brand/lockup-${ground}.svg`}
+      width={image.width}
+      height={image.height}
+      alt=""
+    />
+  ))}
+</span>
+
+<style>
+  .lockup {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    flex: none;
+  }
+
+  img {
+    position: absolute;
+    left: var(--left);
+    top: var(--top);
+    max-width: none;
+  }
+
+  .lockup-light {
+    display: none;
+  }
+
+  :global(:root[data-theme="light"]) .lockup-light {
+    display: block;
+  }
+
+  :global(:root[data-theme="light"]) .lockup-dark {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme="dark"])) .lockup-light {
+      display: block;
+    }
+
+    :global(:root:not([data-theme="dark"])) .lockup-dark {
+      display: none;
+    }
+  }
+</style>
