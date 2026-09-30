@@ -22,16 +22,17 @@ const pageTitle = fullTitle ?? (title ? `${title} · TravelDot` : "TravelDot");
 const waitlistHref = current === "home" ? "#waitlist" : "/#waitlist";
 const year = new Date().getFullYear();
 
-const socials = [
-  {
-    name: "Facebook",
-    icon: "facebook",
-    href: "https://www.facebook.com/profile.php?id=61591517877112",
-  },
-  { name: "Instagram", icon: "instagram", href: "https://www.instagram.com/traveldotapp/" },
-  { name: "X", icon: "x", href: "https://x.com/TravelDotApp" },
-  { name: "YouTube", icon: "youtube", href: "https://www.youtube.com/@TravelDotApp" },
-] as const;
+// Social links are hidden for now. To show them, uncomment this and the list in the footer.
+// const socials = [
+//   {
+//     name: "Facebook",
+//     icon: "facebook",
+//     href: "https://www.facebook.com/profile.php?id=61591517877112",
+//   },
+//   { name: "Instagram", icon: "instagram", href: "https://www.instagram.com/traveldotapp/" },
+//   { name: "X", icon: "x", href: "https://x.com/TravelDotApp" },
+//   { name: "YouTube", icon: "youtube", href: "https://www.youtube.com/@TravelDotApp" },
+// ] as const;
 ---
 
 <html lang="en">
@@ -44,6 +45,15 @@ const socials = [
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
+    <script is:inline>
+      // Runs before first paint so a saved theme never flashes the other one.
+      try {
+        const saved = localStorage.getItem("theme");
+        if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+      } catch {
+        // Storage blocked: follow the system theme.
+      }
+    </script>
   </head>
   <body>
     <div class:list={["page", glow && `glow-${glow}`]}>
@@ -62,6 +72,15 @@ const socials = [
           <a class="btn btn-primary" href={waitlistHref}>
             Join the waitlist
           </a>
+          <button
+            class="theme-toggle"
+            type="button"
+            aria-label="Switch to light mode"
+            data-theme-toggle
+          >
+            <Icon name="ph-sun" class="theme-sun" />
+            <Icon name="ph-moon" class="theme-moon" />
+          </button>
         </nav>
       </header>
 
@@ -75,6 +94,7 @@ const socials = [
             <a class="footer-link" href="/privacy">
               Privacy Policy
             </a>
+            {/*
             <ul class="socials">
               {socials.map((s) => (
                 <li>
@@ -84,12 +104,36 @@ const socials = [
                 </li>
               ))}
             </ul>
+            */}
           </nav>
         </div>
       </footer>
     </div>
   </body>
 </html>
+
+<script>
+  const root = document.documentElement;
+  const toggle = document.querySelector<HTMLButtonElement>("[data-theme-toggle]")!;
+  const systemLight = window.matchMedia("(prefers-color-scheme: light)");
+
+  const current = () => root.dataset.theme ?? (systemLight.matches ? "light" : "dark");
+  const label = () =>
+    toggle.setAttribute("aria-label", `Switch to ${current() === "dark" ? "light" : "dark"} mode`);
+
+  toggle.addEventListener("click", () => {
+    const next = current() === "dark" ? "light" : "dark";
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem("theme", next);
+    } catch {
+      // Private browsing can block storage; the switch still works for this page.
+    }
+    label();
+  });
+  systemLight.addEventListener("change", label);
+  label();
+</script>
 
 <style>
   .page {
@@ -132,6 +176,50 @@ const socials = [
     display: flex;
     align-items: center;
     gap: 22px;
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    /* The 44px hit area overhangs the 20px icon, so pull it back to keep the visible spacing even. */
+    margin: 0 -11px 0 -12px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--td-soft);
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .theme-toggle:hover {
+    color: var(--color-accent);
+  }
+
+  /* Dark shows the sun (switch to light); light shows the moon. */
+  .theme-toggle :global(.theme-moon) {
+    display: none;
+  }
+
+  :global(:root[data-theme="light"]) .theme-toggle :global(.theme-sun) {
+    display: none;
+  }
+
+  :global(:root[data-theme="light"]) .theme-toggle :global(.theme-moon) {
+    display: inline-block;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme="dark"])) .theme-toggle :global(.theme-sun) {
+      display: none;
+    }
+
+    :global(:root:not([data-theme="dark"])) .theme-toggle :global(.theme-moon) {
+      display: inline-block;
+    }
   }
 
   .nav-link {

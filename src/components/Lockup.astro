@@ -1,50 +1,73 @@
 ---
-// The 16b lockup with live text; the page's self-hosted Inter and JetBrains Mono render it.
+// The brand kit's outlined lockups. Live text renders wide enough in other builds of Inter to crowd
+// the period, and the dark version has heavier strokes, so each theme gets its own file.
 interface Props {
+  // Width of the visible logo. The artboard carries padding, which the frame crops off.
   width: number;
 }
 
 const { width } = Astro.props;
-const height = Math.round((width * 98) / 278);
+
+// The artboard is 335 x 120. The crop spans x 28–308 and y 16–114, clear of the dark dot at x 29.
+const scale = width / 280;
+const frame = { width, height: Math.round(98 * scale) };
+const image = {
+  width: Math.round(335 * scale),
+  height: Math.round(120 * scale),
+  left: -28 * scale,
+  top: -16 * scale,
+};
 ---
 
-<svg width={width} height={height} viewBox="30 16 278 98" fill="none" aria-hidden="true">
-  <text
-    x="52"
-    y="61"
-    font-family="'Inter Variable', system-ui, sans-serif"
-    font-size="54"
-    font-weight="600"
-    letter-spacing="-2.43"
-    fill="currentColor"
-  >
-    TravelDot
-  </text>
-  <text
-    x="53"
-    y="106"
-    font-family="'JetBrains Mono Variable', ui-monospace, monospace"
-    font-size="14"
-    font-weight="500"
-    letter-spacing="2.8"
-    style="fill:var(--td-muted)"
-  >
-    KNOW BEFORE YOU GO
-  </text>
-  <path
-    d="M39 95 C39 88, 44 80, 52 80 L 270 80 C 285 80, 295 78, 295 62"
-    stroke="currentColor"
-    stroke-width="3.5"
-    stroke-opacity=".55"
-    stroke-linecap="round"
-  ></path>
-  <circle
-    cx="39"
-    cy="104"
-    r="7"
-    stroke="currentColor"
-    stroke-width="4"
-    style="fill:var(--color-bg)"
-  ></circle>
-  <circle cx="295" cy="53.5" r="7.5" style="fill:var(--td-dot)"></circle>
-</svg>
+<span
+  class="lockup"
+  style={`width:${frame.width}px; height:${frame.height}px; --left:${image.left}px; --top:${image.top}px`}
+>
+  {(["light", "dark"] as const).map((ground) => (
+    <img
+      class={`lockup-${ground}`}
+      src={`/brand/lockup-${ground}.svg`}
+      width={image.width}
+      height={image.height}
+      alt=""
+    />
+  ))}
+</span>
+
+<style>
+  .lockup {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    flex: none;
+  }
+
+  img {
+    position: absolute;
+    left: var(--left);
+    top: var(--top);
+    max-width: none;
+  }
+
+  .lockup-light {
+    display: none;
+  }
+
+  :global(:root[data-theme="light"]) .lockup-light {
+    display: block;
+  }
+
+  :global(:root[data-theme="light"]) .lockup-dark {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme="dark"])) .lockup-light {
+      display: block;
+    }
+
+    :global(:root:not([data-theme="dark"])) .lockup-dark {
+      display: none;
+    }
+  }
+</style>
