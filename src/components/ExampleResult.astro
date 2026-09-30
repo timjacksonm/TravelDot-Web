@@ -180,6 +180,13 @@ const below: [number, IconName, boolean?][] = [
   <div class="group">
     <div class="section-label">Weather</div>
     <div class="weather">
+      <div class="card advisory">
+        <div class="advisory-title">Winter Weather Advisory</div>
+        <div>Snow and blowing snow expected.</div>
+        <div>Itasca and St. Louis counties</div>
+        <div>5:00 AM to 4:00 PM</div>
+      </div>
+
       <div class="weather-cards">
         {places.map((place) => (
           <div
@@ -240,13 +247,6 @@ const below: [number, IconName, boolean?][] = [
           </div>
         </div>
       ))}
-
-      <div class="card advisory">
-        <div class="advisory-title">Winter Weather Advisory</div>
-        <div>Snow and blowing snow expected.</div>
-        <div>Itasca and St. Louis counties</div>
-        <div>5:00 AM to 4:00 PM</div>
-      </div>
     </div>
   </div>
 
