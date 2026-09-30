@@ -1,51 +1,25 @@
 ---
-interface Props {
-  // "arrived" ends on the destination dot; "dead-end" fades out with no destination.
-  variant: "arrived" | "dead-end";
-}
-
-const { variant } = Astro.props;
+// The brand's route with no destination: it fades out, for pages where the visitor's path stops.
 ---
 
-{variant === "arrived" ? (
-  <svg class="ornament" width="240" height="48" viewBox="0 0 240 48" fill="none" aria-hidden="true">
-    <path
-      d="M16 38 H190 C206 38 214 34 214 22"
-      stroke="currentColor"
-      stroke-opacity=".55"
-      stroke-width="3"
-      stroke-linecap="round"
-    />
-    <circle
-      cx="10"
-      cy="38"
-      r="6"
-      stroke="currentColor"
-      stroke-width="3.5"
-      style="fill:var(--color-bg)"
-    />
-    <circle cx="214" cy="14" r="8" style="fill:var(--td-dot)" />
-  </svg>
-) : (
-  <svg class="ornament" width="260" height="48" viewBox="0 0 260 48" fill="none" aria-hidden="true">
-    <defs>
-      <linearGradient id="td-fade" x1="16" y1="0" x2="250" y2="0" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="currentColor" stop-opacity=".55" />
-        <stop offset=".55" stop-color="currentColor" stop-opacity=".4" />
-        <stop offset="1" stop-color="currentColor" stop-opacity="0" />
-      </linearGradient>
-    </defs>
-    <path d="M16 38 H250" stroke="url(#td-fade)" stroke-width="3" stroke-linecap="round" />
-    <circle
-      cx="10"
-      cy="38"
-      r="6"
-      stroke="currentColor"
-      stroke-width="3.5"
-      style="fill:var(--color-bg)"
-    />
-  </svg>
-)}
+<svg class="ornament" width="260" height="48" viewBox="0 0 260 48" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="td-fade" x1="16" y1="0" x2="250" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="currentColor" stop-opacity=".55"></stop>
+      <stop offset=".55" stop-color="currentColor" stop-opacity=".4"></stop>
+      <stop offset="1" stop-color="currentColor" stop-opacity="0"></stop>
+    </linearGradient>
+  </defs>
+  <path d="M16 38 H250" stroke="url(#td-fade)" stroke-width="3" stroke-linecap="round"></path>
+  <circle
+    cx="10"
+    cy="38"
+    r="6"
+    stroke="currentColor"
+    stroke-width="3.5"
+    style="fill:var(--color-bg)"
+  ></circle>
+</svg>
 
 <style>
   .ornament {
