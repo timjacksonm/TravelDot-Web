@@ -2,6 +2,7 @@
 import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
 import "../styles/global.css";
+import Icon from "../components/Icon.astro";
 import Lockup from "../components/Lockup.astro";
 
 interface Props {
@@ -20,6 +21,17 @@ const { title, fullTitle, description, current = "other", glow, noindex = false 
 const pageTitle = fullTitle ?? (title ? `${title} · TravelDot` : "TravelDot");
 const waitlistHref = current === "home" ? "#waitlist" : "/#waitlist";
 const year = new Date().getFullYear();
+
+const socials = [
+  {
+    name: "Facebook",
+    icon: "facebook",
+    href: "https://www.facebook.com/profile.php?id=61591517877112",
+  },
+  { name: "Instagram", icon: "instagram", href: "https://www.instagram.com/traveldotapp/" },
+  { name: "X", icon: "x", href: "https://x.com/TravelDotApp" },
+  { name: "YouTube", icon: "youtube", href: "https://www.youtube.com/@TravelDotApp" },
+] as const;
 ---
 
 <html lang="en">
@@ -56,17 +68,21 @@ const year = new Date().getFullYear();
       <footer class="site-footer wrap">
         <div class="rule"></div>
         <div class="footer-main">
-          <a class="brand" href="/" aria-label="TravelDot home">
-            <Lockup width={170} />
-          </a>
+          <span class="footer-meta">© {year} TravelDot · traveldot.app</span>
           <nav class="footer-nav" aria-label="Footer">
-            <a href="/support">Support</a>
-            <a href="/privacy">Privacy</a>
-            <a href={waitlistHref}>Waitlist</a>
+            <a class="footer-link" href="/privacy">
+              Privacy Policy
+            </a>
+            <ul class="socials">
+              {socials.map((s) => (
+                <li>
+                  <a href={s.href} aria-label={`TravelDot on ${s.name}`}>
+                    <Icon name={s.icon} />
+                  </a>
+                </li>
+              ))}
+            </ul>
           </nav>
-        </div>
-        <div class="footer-meta">
-          <span>© {year} TravelDot · traveldot.app</span>
         </div>
       </footer>
     </div>
@@ -140,13 +156,14 @@ const year = new Date().getFullYear();
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: 24px;
+    align-items: center;
+    gap: 8px 24px;
   }
 
   .footer-nav {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px 24px;
     font-size: 15px;
   }
@@ -154,18 +171,34 @@ const year = new Date().getFullYear();
   .footer-nav a {
     color: var(--td-soft);
     text-decoration: none;
-    padding: 8px 0;
   }
 
   .footer-nav a:hover {
     color: var(--color-accent);
   }
 
-  .footer-meta {
+  .footer-link {
+    padding: 8px 0;
+  }
+
+  .socials {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 8px 24px;
+    list-style: none;
+    margin: 0 -13px 0 0;
+    padding: 0;
+  }
+
+  /* 44px hit targets around 18px icons. */
+  .socials a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .footer-meta {
     font-size: 13px;
     color: var(--td-muted);
   }
