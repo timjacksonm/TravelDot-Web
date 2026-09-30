@@ -1,3 +1,13 @@
+/* Arial scaled to Inter's widths, so text doesn't rewrap when the web font swaps in. */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  size-adjust: 107.12%;
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+}
+
 :root {
   color-scheme: dark;
   --color-bg: #161826;
@@ -16,7 +26,7 @@
 
   --radius-md: 8px;
   --radius-lg: 14px;
-  --font-body: "Inter Variable", system-ui, sans-serif;
+  --font-body: "Inter Variable", "Inter Fallback", system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
   --page-max: 1180px;
   --gutter: clamp(20px, 5vw, 56px);

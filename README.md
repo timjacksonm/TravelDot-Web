@@ -4,30 +4,7 @@ The coming-soon site for [traveldot.app](https://traveldot.app). TravelDot is a 
 road-conditions app: enter a trip and it shows closures, crashes, road conditions and weather along
 the route. The site explains the app and runs the waitlist.
 
-Built with [Astro](https://astro.build) as a static site, deployed to Cloudflare Workers.
-
-## Running it locally
-
-Requires Node 24.
-
-```sh
-cp .env.example .env
-npm install
-npm run dev
-```
-
-`.env.example` turns on `PUBLIC_API_MOCK`, which fakes the waitlist API so the form works without a
-backend. Put `mock400`, `mock404`, `mock429` or `mock500` in an email or token to see each error.
-
-## Scripts
-
-| Command                | What it does                        |
-| ---------------------- | ----------------------------------- |
-| `npm run dev`          | Starts the dev server               |
-| `npm run build`        | Builds the site to `dist/`          |
-| `npm run check`        | Type-checks `.astro` and TypeScript |
-| `npm run lint:all`     | Runs ESLint                         |
-| `npm run format:check` | Checks formatting with Prettier     |
+Built with [Astro](https://astro.build) as a static site.
 
 ## Layout
 

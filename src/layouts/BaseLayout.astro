@@ -2,6 +2,8 @@
 import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
 import "../styles/global.css";
+import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+import monoLatin from "@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url";
 import Icon from "../components/Icon.astro";
 import Lockup from "../components/Lockup.astro";
 
@@ -49,6 +51,8 @@ const year = new Date().getFullYear();
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monoLatin} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -172,6 +176,19 @@ const year = new Date().getFullYear();
     gap: 16px;
     flex-wrap: wrap;
     padding-block: 18px;
+  }
+
+  /* Stack before the row gets tight, so the header never wraps differently once fonts load. */
+  @media (max-width: 600px) {
+    .site-header {
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .header-nav {
+      align-self: flex-end;
+    }
   }
 
   .brand {
