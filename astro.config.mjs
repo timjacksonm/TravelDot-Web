@@ -1,4 +1,5 @@
 // @ts-check
+import process from "node:process";
 import { defineConfig, envField } from "astro/config";
 
 // Cloudflare builds every branch with the same variables, and the API only accepts traveldot.app.
