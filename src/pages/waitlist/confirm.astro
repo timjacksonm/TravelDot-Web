@@ -7,6 +7,7 @@ import RouteOrnament from "../../components/RouteOrnament.astro";
   title="You're on the list"
   description="Confirm your spot on the TravelDot waitlist."
   glow="page"
+  waitlistButton={false}
 >
   <div class="status" data-view="pending" tabindex="-1">
     <div class="kicker">Confirming your email</div>
@@ -18,9 +19,10 @@ import RouteOrnament from "../../components/RouteOrnament.astro";
   </div>
 
   <div class="status" data-view="done" tabindex="-1" hidden>
-    <RouteOrnament variant="arrived" />
     <div class="kicker">Email confirmed</div>
-    <h1>You're on the waitlist.</h1>
+    <h1>
+      You're on the waitlist<span class="brand-dot" aria-hidden="true"></span>
+    </h1>
     <p class="status-lede">
       Thanks for confirming. We'll email you when TravelDot is ready to download for iPhone and
       Android.
@@ -39,7 +41,7 @@ import RouteOrnament from "../../components/RouteOrnament.astro";
   </div>
 
   <div class="status" data-view="invalid" tabindex="-1" hidden>
-    <RouteOrnament variant="dead-end" />
+    <RouteOrnament />
     <div class="kicker">Link expired</div>
     <h1>This link doesn't work anymore.</h1>
     <p class="status-lede">
@@ -56,7 +58,7 @@ import RouteOrnament from "../../components/RouteOrnament.astro";
   </div>
 
   <div class="status" data-view="error" tabindex="-1" hidden>
-    <RouteOrnament variant="dead-end" />
+    <RouteOrnament />
     <div class="kicker">Not confirmed yet</div>
     <h1>Your email isn't confirmed yet.</h1>
     <p class="status-lede">
@@ -87,3 +89,15 @@ import RouteOrnament from "../../components/RouteOrnament.astro";
     );
   }
 </script>
+
+<style>
+  /* The logo's trick: the brand's blue destination dot stands in for the period. */
+  .brand-dot {
+    display: inline-block;
+    width: 0.26em;
+    height: 0.26em;
+    margin-left: 0.07em;
+    border-radius: 50%;
+    background: var(--td-dot);
+  }
+</style>

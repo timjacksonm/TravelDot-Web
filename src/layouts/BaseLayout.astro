@@ -14,9 +14,19 @@ interface Props {
   glow?: "home" | "page";
   // Token pages and the 404 have nothing worth indexing.
   noindex?: boolean;
+  // The waitlist pages hide the header's join button: those visitors already joined or are leaving.
+  waitlistButton?: boolean;
 }
 
-const { title, fullTitle, description, current = "other", glow, noindex = false } = Astro.props;
+const {
+  title,
+  fullTitle,
+  description,
+  current = "other",
+  glow,
+  noindex = false,
+  waitlistButton = true,
+} = Astro.props;
 
 const pageTitle = fullTitle ?? (title ? `${title} · TravelDot` : "TravelDot");
 const waitlistHref = current === "home" ? "#waitlist" : "/#waitlist";
@@ -69,9 +79,11 @@ const year = new Date().getFullYear();
           >
             Support
           </a>
-          <a class="btn btn-primary" href={waitlistHref}>
-            Join the waitlist
-          </a>
+          {waitlistButton && (
+            <a class="btn btn-primary" href={waitlistHref}>
+              Join the waitlist
+            </a>
+          )}
           <button
             class="theme-toggle"
             type="button"

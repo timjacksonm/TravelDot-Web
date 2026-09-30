@@ -2,7 +2,11 @@
 import StatusLayout from "../../layouts/StatusLayout.astro";
 ---
 
-<StatusLayout title="Unsubscribe" description="Leave the TravelDot waitlist.">
+<StatusLayout
+  title="Unsubscribe"
+  description="Leave the TravelDot waitlist."
+  waitlistButton={false}
+>
   <div class="status" data-view="ask" tabindex="-1">
     <div class="kicker">Email preferences</div>
     <h1>Leave the waitlist?</h1>
