@@ -257,7 +257,7 @@ a:hover {
   flex: none;
   vertical-align: -0.125em;
   fill: currentColor;
-  /* Material Symbols' viewBox crops their padding, and a few glyphs reach into it */
+  /* Cropped Material Symbols reach slightly into their padding */
   overflow: visible;
 }
 
