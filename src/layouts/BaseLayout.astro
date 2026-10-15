@@ -31,6 +31,9 @@ const {
 } = Astro.props;
 
 const pageTitle = fullTitle ?? (title ? `${title} · TravelDot` : "TravelDot");
+// Crawlers and link previews need absolute URLs, so these build on `site` in astro.config.
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const shareImage = new URL("/og-image.png", Astro.site);
 const waitlistHref = current === "home" ? "#waitlist" : "/#waitlist";
 const year = new Date().getFullYear();
 
@@ -58,7 +61,25 @@ const year = new Date().getFullYear();
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    {noindex && <meta name="robots" content="noindex" />}
+    {/* The 404 would name /404/ as its address, so noindex pages skip canonical and og:url. */}
+    {noindex ? (
+      <meta name="robots" content="noindex" />
+    ) : (
+      <>
+        <link rel="canonical" href={pageUrl} />
+        <meta property="og:url" content={pageUrl} />
+      </>
+    )}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TravelDot" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="TravelDot: Know before you go" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <slot name="head" />
     <script is:inline>
       // Runs before first paint so a saved theme never flashes the other one.
       try {

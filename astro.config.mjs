@@ -1,5 +1,7 @@
 // @ts-check
 import process from "node:process";
+import { URL } from "node:url";
+import sitemap from "@astrojs/sitemap";
 import { defineConfig, envField } from "astro/config";
 
 // Cloudflare builds every branch with the same variables, and the API only accepts traveldot.app.
@@ -13,6 +15,13 @@ if (branch && branch !== "main") {
 // https://astro.build/config
 export default defineConfig({
   site: "https://traveldot.app",
+  integrations: [
+    // StatusLayout marks these noindex, so the sitemap leaves them out too.
+    sitemap({
+      filter: (page) =>
+        !["/404/", "/waitlist/confirm/", "/waitlist/unsubscribe/"].includes(new URL(page).pathname),
+    }),
+  ],
   // The privacy copy uses straight quotes, as in the design.
   markdown: { smartypants: false },
   env: {
