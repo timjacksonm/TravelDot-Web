@@ -8,7 +8,7 @@
 import Icon, { type IconName } from "./Icon.astro";
 
 // The route's length in miles. Every mark on the route line sits at mile / MILES along it.
-const MILES = 48;
+const MILES = 58;
 const along = (mile: number) => (mile / MILES) * 100;
 
 type Hour = [temperature: number, chance: number, snowInches: number];
@@ -127,7 +127,7 @@ const conditions: Row[] = [
   {
     icon: "snowflake",
     title: "Reduced visibility, blowing snow",
-    detail: ["Mile 43–48", "US-169", "northbound"],
+    detail: ["Mile 43–58", "US-169", "northbound"],
   },
 ];
 
@@ -160,7 +160,7 @@ const advisories: Row[] = [
   {
     icon: "ms-thunderstorm",
     title: "US-169: Reduced visibility",
-    detail: ["Mile 43–48", "northbound"],
+    detail: ["Mile 43–58", "northbound"],
   },
 ];
 
@@ -169,15 +169,15 @@ const stretches = [
   [2, 12],
   [13, 31],
   [32, 43],
-  [43, 48],
+  [43, 58],
 ].map(([start, end]) => ({ left: along(start), width: along(end) - along(start) }));
 
 // Above the line, one icon per condition. Touching stretches with the same icon share one, so
-// the two snowflakes from mile 32 to 48 draw as a single mark in the middle of that span.
+// the two snowflakes from mile 32 to 58 draw as a single mark in the middle of that span.
 const conditionMarks: [start: number, end: number, IconName][] = [
   [2, 12, "snowflake"],
   [13, 31, "ms-severe-cold"],
-  [32, 48, "snowflake"],
+  [32, 58, "snowflake"],
 ];
 
 // Below the line, one icon per event at its mile: incidents in red, everything else grey.
@@ -377,7 +377,7 @@ const eventMarks: [mile: number, IconName, incident: boolean][] = [
         <span class="shield">US-169</span>
         <Icon name="ms-chevron-right" class="roads-chevron" />
       </div>
-      <div class="sheet-note muted-3">48 miles · 58 min</div>
+      <div class="sheet-note muted-3">58 miles · 1 hr 6 min</div>
     </div>
     <div class="separator"></div>
     <div class="directions">
