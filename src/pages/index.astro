@@ -17,6 +17,15 @@ const shows: [IconName, string][] = [
     "Weather: conditions at your origin and destination, with an hourly forecast available for a closer look",
   ],
 ];
+
+// Tells search engines who publishes the site. No `sameAs` while the social links stay hidden.
+const organization = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "TravelDot",
+  url: Astro.site?.href,
+  logo: new URL("/apple-touch-icon.png", Astro.site).href,
+};
 ---
 
 <BaseLayout
@@ -25,6 +34,7 @@ const shows: [IconName, string][] = [
   current="home"
   glow="home"
 >
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(organization)} />
   <main class="wrap">
     <section class="hero">
       <div class="kicker">Coming to iPhone and Android</div>
