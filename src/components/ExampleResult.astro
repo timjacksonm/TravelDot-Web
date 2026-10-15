@@ -1,139 +1,190 @@
 ---
-// A static illustration of the app's result screen. None of it is live data.
+// A static copy of the app's result screen, showing the app's sample check (Grand Rapids to
+// Virginia). The data is copied word for word from the mobile repo's src/dev/sample-check.ts, which
+// is the source: change it there first, then here. It's invented, not live data.
+//
+// The layout, sizes and colors follow the app's components (src/components/result in the mobile
+// repo), so a change to the app's result screen should land here too.
 import Icon, { type IconName } from "./Icon.astro";
+
+// The route's length in miles. Every mark on the route line sits at mile / MILES along it.
+const MILES = 48;
+const along = (mile: number) => (mile / MILES) * 100;
+
+type Hour = [temperature: number, chance: number, snowInches: number];
 
 interface Place {
   id: string;
   name: string;
-  short: string;
-  temp: number;
-  summary: string;
-  preview: [string, number][];
-  hours: [string, number, number][];
+  temperature: number;
+  forecast: string;
+  // What the hourly forecast says is falling while snow is, before it turns to rain.
+  snowingAs: string;
+  hours: Hour[];
 }
 
+// The forecast starts at 8 AM, the time the sample check ran.
 const places: Place[] = [
   {
-    id: "grand-rapids",
+    id: "origin",
     name: "Grand Rapids, MN",
-    short: "Grand Rapids",
-    temp: 30,
-    summary: "Rain and snow · 10 mph NW",
-    preview: [
-      ["9a", 30],
-      ["10a", 31],
-      ["11a", 31],
-      ["12p", 32],
-    ],
+    temperature: 30,
+    forecast: "Rain and snow · 10 mph NW",
+    snowingAs: "Rain and snow",
     hours: [
-      ["Now", 30, 60],
-      ["9a", 30, 60],
-      ["10a", 31, 55],
-      ["11a", 31, 50],
-      ["12p", 32, 45],
-      ["1p", 32, 40],
-      ["2p", 32, 40],
-      ["3p", 31, 45],
-      ["4p", 30, 50],
-      ["5p", 29, 55],
-      ["6p", 28, 60],
-      ["7p", 27, 65],
+      [30, 60, 0.1],
+      [30, 60, 0.1],
+      [31, 55, 0.1],
+      [31, 50, 0.1],
+      [32, 45, 0.1],
+      [32, 40, 0.1],
+      [32, 40, 0],
+      [31, 45, 0],
+      [30, 50, 0],
+      [29, 55, 0],
+      [28, 60, 0],
+      [27, 65, 0],
     ],
   },
   {
-    id: "virginia",
+    id: "destination",
     name: "Virginia, MN",
-    short: "Virginia",
-    temp: 25,
-    summary: "Heavy snow · 16 mph NW",
-    preview: [
-      ["9a", 25],
-      ["10a", 24],
-      ["11a", 24],
-      ["12p", 25],
-    ],
+    temperature: 25,
+    forecast: "Heavy snow · 16 mph NW",
+    snowingAs: "Snow",
     hours: [
-      ["Now", 25, 90],
-      ["9a", 25, 90],
-      ["10a", 24, 85],
-      ["11a", 24, 85],
-      ["12p", 25, 80],
-      ["1p", 25, 75],
-      ["2p", 24, 70],
-      ["3p", 24, 70],
-      ["4p", 23, 75],
-      ["5p", 22, 75],
-      ["6p", 21, 80],
-      ["7p", 20, 80],
+      [25, 90, 0.4],
+      [25, 90, 0.4],
+      [24, 85, 0.3],
+      [24, 85, 0.3],
+      [25, 80, 0.3],
+      [25, 75, 0.2],
+      [24, 70, 0.2],
+      [24, 70, 0.2],
+      [23, 75, 0.2],
+      [22, 75, 0.3],
+      [21, 80, 0.3],
+      [20, 80, 0.3],
     ],
   },
 ];
+
+/** "Now", then "9a", "10a", "12p". */
+function hourLabel(index: number) {
+  if (index === 0) return "Now";
+  const hour = 8 + index;
+  return `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? "a" : "p"}`;
+}
+
+// The app picks an hour's icon from the forecast's words, first match wins. Only the three the
+// sample needs are here.
+function forecastIcon(words: string): IconName {
+  if (/(rain|drizzle).*snow|snow.*(rain|drizzle)/i.test(words)) return "ms-weather-mix";
+  if (/snow/i.test(words)) return "ms-weather-snowy";
+  return "ms-rainy";
+}
+
+const alert = {
+  event: "Winter Weather Advisory",
+  window: "5:00 AM to 4:00 PM",
+  description:
+    "* WHAT...Snow and blowing snow expected. Additional snow accumulations of 2 to 4 inches.\n\n" +
+    "* WHERE...Itasca and St. Louis counties.\n\n* WHEN...Until 4 PM CDT this afternoon.\n\n" +
+    "* IMPACTS...Plan on slippery road conditions. Blowing snow could significantly reduce " +
+    "visibility.",
+  instruction:
+    "Slow down and use caution while traveling. The latest road conditions for Minnesota can be " +
+    "obtained by calling 5 1 1.",
+  near: "Near Grand Rapids, MN",
+};
 
 interface Row {
   icon: IconName;
   title: string;
-  meta: string;
-  muted?: boolean;
+  note?: string;
+  // Split on " · " so a line only breaks between parts, as in the app.
+  detail: string[];
 }
 
+// The app draws "Wet pavement and slush" and "Reduced visibility, blowing snow" with the snowflake:
+// it checks for snow or slush before wet or visibility.
 const conditions: Row[] = [
   {
-    icon: "droplet",
-    title: "US-169: Wet pavement and slush",
-    meta: "Mile 2–12 · northbound, southbound",
+    icon: "snowflake",
+    title: "Wet pavement and slush",
+    detail: ["Mile 2–12", "US-169", "northbound, southbound"],
   },
   {
-    icon: "severe-cold",
-    title: "US-169: Ice on roadway",
-    meta: "Mile 13–31 · northbound, southbound",
+    icon: "ms-severe-cold",
+    title: "Ice on roadway",
+    detail: ["Mile 13–31", "US-169", "northbound, southbound"],
   },
   {
     icon: "snowflake",
-    title: "US-169: Snow-covered roadway",
-    meta: "Mile 32–43 · northbound, southbound",
+    title: "Snow-covered roadway",
+    detail: ["Mile 32–43", "US-169", "northbound, southbound"],
   },
   {
-    icon: "eye-slash",
-    title: "US-169: Reduced visibility, blowing snow",
-    meta: "Mile 43–48 · northbound",
+    icon: "snowflake",
+    title: "Reduced visibility, blowing snow",
+    detail: ["Mile 43–48", "US-169", "northbound"],
   },
 ];
 
-const incidents: Row[] = [
+// How many rows a section shows before "Show all".
+const PREVIEW_ROWS = 3;
+
+const activeIncidents: Row[] = [
+  {
+    icon: "car-burst",
+    title: "US-169: Crash reported",
+    note: "right lane blocked",
+    detail: ["Mile 36", "northbound"],
+  },
+];
+
+const clearedIncidents: Row[] = [
   {
     icon: "car-burst",
     title: "US-169: Vehicle spun out",
-    meta: "Mile 18 · northbound · Resolved 7:30 AM",
-    muted: true,
+    detail: ["Mile 18", "northbound", "Cleared 7:30 AM"],
   },
 ];
 
 const advisories: Row[] = [
   {
-    icon: "truck",
+    icon: "ms-local-shipping",
     title: "US-169: Snowplow activity",
-    meta: "Mile 28–42 · northbound, southbound",
+    detail: ["Mile 28–42", "northbound, southbound"],
   },
-  { icon: "circle-info", title: "US-169: Reduced visibility", meta: "Mile 43–48 · northbound" },
+  {
+    icon: "ms-thunderstorm",
+    title: "US-169: Reduced visibility",
+    detail: ["Mile 43–48", "northbound"],
+  },
 ];
 
-// Positions along the route line, as a percent of its length.
-const segments = [
-  [4, 21],
-  [27, 38],
-  [67, 22.5],
-  [90.5, 9.5],
+// Condition stretches on the route line, one per reported stretch.
+const stretches = [
+  [2, 12],
+  [13, 31],
+  [32, 43],
+  [43, 48],
+].map(([start, end]) => ({ left: along(start), width: along(end) - along(start) }));
+
+// Above the line, one icon per condition. Touching stretches with the same icon share one, so
+// the two snowflakes from mile 32 to 48 draw as a single mark in the middle of that span.
+const conditionMarks: [start: number, end: number, IconName][] = [
+  [2, 12, "snowflake"],
+  [13, 31, "ms-severe-cold"],
+  [32, 48, "snowflake"],
 ];
-const above: [number, IconName][] = [
-  [15, "droplet"],
-  [46, "severe-cold"],
-  [77, "snowflake"],
-  [95, "eye-slash"],
-];
-const below: [number, IconName, boolean?][] = [
-  [38, "car-burst", true],
-  [73, "truck"],
-  [95, "circle-info"],
+
+// Below the line, one icon per event at its mile: incidents in red, everything else grey.
+const eventMarks: [mile: number, IconName, incident: boolean][] = [
+  [28, "ms-local-shipping", false],
+  [36, "car-burst", true],
+  [43, "ms-thunderstorm", false],
 ];
 ---
 
@@ -143,219 +194,291 @@ const below: [number, IconName, boolean?][] = [
     <span>Illustration, not live</span>
   </div>
 
-  <div class="trip">
-    <div class="trip-name">
-      Grand Rapids, MN <Icon name="arrow-right" class="trip-arrow" /> Virginia, MN
-    </div>
-    <div class="share" aria-hidden="true">
-      <Icon name="arrow-up-from-bracket" />
-    </div>
-  </div>
-
-  <div class="group">
-    <div class="checked">Checked 8:00 AM · road data as of 7:42 AM</div>
-    <div class="card summary">
-      <div class="summary-title">Slush leaving Grand Rapids, heavier snow near Virginia.</div>
-      <p class="summary-text">
-        Wet snow and slush are reported on US-169 leaving Grand Rapids, with ice on the roadway
-        through the middle of the route. A vehicle that spun out near mile 18 was cleared at 7:30
-        AM. Heavier snow, blowing snow and reduced visibility are reported approaching Virginia. A
-        Winter Weather Advisory is in effect until 4 PM.
-      </p>
-      <div class="feedback">
-        <div class="feedback-text">
-          <span class="ai">Generated by AI</span>
-          <span>Was this summary helpful?</span>
-        </div>
-        <button type="button" class="round" aria-label="Helpful">
-          <Icon name="thumbs-up" />
-        </button>
-        <button type="button" class="round" aria-label="Not helpful">
-          <Icon name="thumbs-down" />
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="group">
-    <div class="section-label">Weather</div>
-    <div class="weather">
-      <div class="card advisory">
-        <div class="advisory-title">Winter Weather Advisory</div>
-        <div>Snow and blowing snow expected.</div>
-        <div>Itasca and St. Louis counties</div>
-        <div>5:00 AM to 4:00 PM</div>
-      </div>
-
-      <div class="weather-cards">
-        {places.map((place) => (
-          <div
-            class="card wx-card"
-            role="button"
-            tabindex="0"
-            aria-label={`${place.name} weather, open the hourly forecast`}
-            aria-expanded="false"
-            aria-controls={`wx-${place.id}`}
-            data-wx={place.id}
-          >
-            <div class="wx-where">{place.short} · Now</div>
-            <div class="wx-temp">{place.temp}°</div>
-            <div class="wx-summary">{place.summary}</div>
-            <div class="wx-preview" aria-label="Hourly preview">
-              <div class="wx-preview-hours">
-                {place.preview.map(([t, temp]) => (
-                  <div>
-                    <span class="wx-time">{t}</span>
-                    <span class="wx-preview-temp">{temp}°</span>
-                  </div>
-                ))}
-              </div>
-              <Icon name="chevron-right" class="wx-chevron" />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {places.map((place) => (
-        <div
-          id={`wx-${place.id}`}
-          class="card wx-panel"
-          role="region"
-          aria-label={`${place.name} · Next 12 hours`}
-          hidden
-        >
-          <div class="wx-panel-head">
-            <span>{place.name} · Next 12 hours</span>
-            <button
-              type="button"
-              class="round small"
-              aria-label="Close hourly forecast"
-              data-wx-close
-            >
-              <Icon name="xmark" />
-            </button>
-          </div>
-          <div class="wx-hours">
-            {place.hours.map(([t, temp, pop]) => (
-              <div class="wx-hour">
-                <span class="wx-time">{t}</span>
-                <Icon name={pop >= 50 ? "snowflake" : "cloud"} />
-                <span class="wx-hour-temp">{temp}°</span>
-                <span class="wx-pop">{pop}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-
-  <div class="group">
-    <div class="section-label">Route</div>
-    <div class="card route">
-      <div class="track">
-        <div class="base"></div>
-        {segments.map(([left, width]) => (
-          <div class="segment" style={`left:${left}%; width:${width}%`} />
-        ))}
-        {above.map(([left, icon]) => (
-          <div class="marker above" style={`left:${left}%`}>
-            <div class="tick" />
-            <div class="glyph">
-              <Icon name={icon} />
-            </div>
-          </div>
-        ))}
-        {below.map(([left, icon, muted]) => (
-          <div class="marker below" style={`left:${left}%`}>
-            <div class="tick" />
-            <div class:list={["glyph", { muted }]}>
-              <Icon name={icon} />
-            </div>
-          </div>
-        ))}
-        <div class="origin"></div>
-        <div class="destination">
+  <div class="from-to">
+    <div class="from-to-top">
+      <div class="rail" aria-hidden="true">
+        <div class="dot-origin"></div>
+        <div class="rail-line"></div>
+        <div class="dot-destination">
           <div></div>
         </div>
       </div>
-      <div class="ends">
-        <span>Grand Rapids, MN</span>
-        <span>Virginia, MN</span>
-      </div>
-      <div class="distance">48 miles · US-169</div>
-    </div>
-  </div>
-
-  <div class="group">
-    <div class="section-label">Conditions</div>
-    <div class="card list">
-      {conditions.map((row, i) => (
-        <div class:list={["row", { extra: i === 3, divided: i < 2 }]} hidden={i === 3}>
-          <div class="row-icon">
-            <Icon name={row.icon} />
-          </div>
-          <div class="row-text">
-            <span class="row-title">{row.title}</span>
-            <span class="row-meta">{row.meta}</span>
-          </div>
+      <div class="places">
+        <div>
+          <div class="caption muted-3">From</div>
+          <div class="sheet-title">Grand Rapids, MN</div>
         </div>
-      ))}
-      <div class="more" role="button" tabindex="0" aria-expanded="false" data-more>
-        <span data-more-label>Show all 4 conditions</span>
-        <Icon name="chevron-down" class="more-down" />
-        <Icon name="chevron-up" class="more-up" />
+        <div>
+          <div class="caption muted-3">To</div>
+          <div class="sheet-title">Virginia, MN</div>
+        </div>
       </div>
     </div>
-  </div>
-
-  <div class="group">
-    <div class="section-label">Incidents</div>
-    <div class="card list">
-      {incidents.map((row) => (
-        <div class="row">
-          <div class:list={["row-icon", { muted: row.muted }]}>
-            <Icon name={row.icon} />
-          </div>
-          <div class="row-text">
-            <span class="row-title">{row.title}</span>
-            <span class="row-meta">{row.meta}</span>
-          </div>
-        </div>
-      ))}
+    <div class="from-to-footer">
+      <div class="footer-glyph">
+        <Icon name="ms-history" />
+      </div>
+      <div class="subtitle muted-3">Checked 8:00 AM · road data as of 7:42 AM</div>
     </div>
   </div>
 
-  <div class="group">
-    <div class="section-label">Advisories</div>
-    <div class="card list">
-      {advisories.map((row, i) => (
-        <div class:list={["row", { divided: i < advisories.length - 1 }]}>
-          <div class="row-icon">
-            <Icon name={row.icon} />
-          </div>
-          <div class="row-text">
-            <span class="row-title">{row.title}</span>
-            <span class="row-meta">{row.meta}</span>
-          </div>
-        </div>
-      ))}
+  <h3 class="section-header">Summary</h3>
+  <div class="card">
+    <p class="body summary-text">
+      Wet snow and slush are reported on US-169 leaving Grand Rapids, with ice on the roadway
+      through the middle of the route. A vehicle that spun out near mile 18 was cleared at 7:30 AM.
+      A crash is reported near mile 36 northbound, with the right lane blocked. Heavier snow,
+      blowing snow and reduced visibility are reported approaching Virginia. A Winter Weather
+      Advisory is in effect until 4 PM.
+    </p>
+    <div class="listen" aria-hidden="true">
+      <Icon name="ms-volume-down" />
+      <span>Listen</span>
+    </div>
+    <div class="feedback">
+      <div class="feedback-text">
+        <span class="caption muted-4">Generated by AI</span>
+        <span class="subtitle muted-3">Was this summary helpful?</span>
+      </div>
+      <div class="thumb" aria-hidden="true">
+        <Icon name="ms-thumb-up" />
+      </div>
+      <div class="thumb" aria-hidden="true">
+        <Icon name="ms-thumb-down" />
+      </div>
     </div>
   </div>
+
+  <h3 class="section-header">Weather</h3>
+  <div
+    class="card alert"
+    role="button"
+    tabindex="0"
+    aria-expanded="false"
+    aria-label="Winter Weather Advisory, show details"
+    data-alert
+  >
+    <div class="alert-kicker muted-3">Weather alert</div>
+    <div class="row-title strong">{alert.event}</div>
+    <div class="subtitle muted-2">{alert.window}</div>
+    <div class="subtitle muted-2 alert-text alert-description">{alert.description}</div>
+    <div class="alert-more" hidden>
+      <div class="subtitle strong alert-text">What to do</div>
+      <div class="subtitle muted-2">{alert.instruction}</div>
+    </div>
+    <div class="caption muted-3 alert-text">{alert.near}</div>
+    <div class="caption tint alert-text" data-alert-label>
+      Show details
+    </div>
+  </div>
+
+  <div class="pair">
+    {places.map((place) => (
+      <div
+        class="card anchor"
+        role="button"
+        tabindex="0"
+        aria-expanded="false"
+        aria-controls={`hourly-${place.id}`}
+        aria-label={`Show hourly forecast for ${place.name}`}
+        data-anchor={place.id}
+      >
+        <div class="caption muted-3 one-line">{place.name} · Now</div>
+        <div class="temperature">{place.temperature}°</div>
+        <div class="subtitle muted-2 one-line" data-fit>
+          {place.forecast}
+        </div>
+        <div class="preview">
+          {place.hours.slice(1, 5).map(([temperature], i) => (
+            <div>
+              <span class="caption muted-3">{hourLabel(i + 1)}</span>
+              <span class="subtitle strong">{temperature}°</span>
+            </div>
+          ))}
+        </div>
+        <div class="forecast-link">
+          <span>Hourly forecast</span>
+          <Icon name="ms-keyboard-arrow-down" class="when-closed" />
+          <Icon name="ms-keyboard-arrow-up" class="when-open" />
+        </div>
+      </div>
+    ))}
+  </div>
+
+  {places.map((place) => (
+    <div
+      id={`hourly-${place.id}`}
+      class="card hourly"
+      role="region"
+      aria-label={`${place.name} · Next ${place.hours.length} hours`}
+      hidden
+    >
+      <div class="hourly-header">
+        <span class="row-title strong">
+          {place.name} · Next {place.hours.length} hours
+        </span>
+        <button type="button" class="hourly-close" aria-label="Close hourly forecast" data-close>
+          <Icon name="ms-close" />
+        </button>
+      </div>
+      <div class="hours">
+        {place.hours.map(([temperature, chance, snow], i) => (
+          <div class="hour">
+            <span class="caption muted-3">{hourLabel(i)}</span>
+            <Icon name={forecastIcon(snow > 0 ? place.snowingAs : "Rain")} class="hour-glyph" />
+            <span class="subtitle strong">{temperature}°</span>
+            <span class="caption tint">{chance}%</span>
+            <span class="caption muted-2">{snow > 0 ? `${snow.toFixed(1)}″` : " "}</span>
+          </div>
+        ))}
+      </div>
+      <div class="caption muted-3">Bottom row: snowfall each hour, in inches.</div>
+    </div>
+  ))}
+
+  <h3 class="section-header">Route</h3>
+  <div class="card route">
+    <div class="route-names">
+      <span>Grand Rapids, MN</span>
+      <span>Virginia, MN</span>
+    </div>
+    <div class="route-line" aria-hidden="true">
+      <div class="dot-origin"></div>
+      <div class="track-area">
+        <div class="track"></div>
+        {stretches.map(({ left, width }) => (
+          <div class="stretch" style={`left:${left}%; width:${width}%`} />
+        ))}
+        {conditionMarks.map(([start, end, icon]) => (
+          <div class="pin above" style={`left:${(along(start) + along(end)) / 2}%`}>
+            <div class="pin-glyph">
+              <Icon name={icon} />
+            </div>
+            <div class="connector" />
+          </div>
+        ))}
+        {eventMarks.map(([mile, icon, incident]) => (
+          <div class:list={["pin below", { incident }]} style={`left:${along(mile)}%`}>
+            <div class="connector" />
+            <div class="pin-glyph">
+              <Icon name={icon} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div class="dot-destination">
+        <div></div>
+      </div>
+    </div>
+    <div class="separator"></div>
+    <div class="roads">
+      <div class="caption muted-3 roads-label">Roads checked</div>
+      <div class="shield-row">
+        <span class="shield">US-169</span>
+        <Icon name="ms-chevron-right" class="roads-chevron" />
+      </div>
+      <div class="sheet-note muted-3">48 miles · 58 min</div>
+    </div>
+    <div class="separator"></div>
+    <div class="directions">
+      <span class="directions-icon">
+        <Icon name="ms-directions" />
+      </span>
+      <span class="directions-label">View driving directions</span>
+      <Icon name="ms-chevron-right" class="directions-chevron" />
+    </div>
+  </div>
+
+  <h3 class="section-header">Conditions</h3>
+  <div class="group">
+    {conditions.map((row, i) => (
+      <div class="row" hidden={i >= PREVIEW_ROWS} data-folded={i >= PREVIEW_ROWS}>
+        <span class="row-glyph tint">
+          <Icon name={row.icon} />
+        </span>
+        <div class="row-body">
+          <span class="row-title">{row.title}</span>
+          <span class="subtitle muted-3">
+            {row.detail.map((part, j) => (
+              <span class="part">{j < row.detail.length - 1 ? `${part} · ` : part}</span>
+            ))}
+          </span>
+        </div>
+      </div>
+    ))}
+    <div class="row fold" role="button" tabindex="0" aria-expanded="false" data-fold>
+      <span class="row-title tint" data-fold-label>
+        Show all {conditions.length} conditions
+      </span>
+      <Icon name="ms-chevron-right" class="fold-chevron" />
+    </div>
+  </div>
+
+  <h3 class="section-header">Incidents</h3>
+  <div class="group">
+    {activeIncidents.map((row) => (
+      <div class="row">
+        <span class="row-glyph danger">
+          <Icon name={row.icon} />
+        </span>
+        <div class="row-body">
+          <span class="row-title">{row.title}</span>
+          {row.note && <span class="subtitle muted-2">{row.note}</span>}
+          <span class="subtitle muted-3">
+            {row.detail.map((part, j) => (
+              <span class="part">{j < row.detail.length - 1 ? `${part} · ` : part}</span>
+            ))}
+          </span>
+        </div>
+      </div>
+    ))}
+    {clearedIncidents.map((row) => (
+      <div class="row">
+        <span class="row-glyph muted-3">
+          <Icon name={row.icon} />
+        </span>
+        <div class="row-body">
+          <span class="row-title muted-2">{row.title}</span>
+          <span class="subtitle muted-3">
+            {row.detail.map((part, j) => (
+              <span class="part">{j < row.detail.length - 1 ? `${part} · ` : part}</span>
+            ))}
+          </span>
+        </div>
+        <span class="cleared">Cleared</span>
+      </div>
+    ))}
+  </div>
+
+  <h3 class="section-header">Advisories</h3>
+  <div class="group">
+    {advisories.map((row) => (
+      <div class="row">
+        <span class="row-glyph muted-2">
+          <Icon name={row.icon} />
+        </span>
+        <div class="row-body">
+          <span class="row-title">{row.title}</span>
+          <span class="subtitle muted-3">
+            {row.detail.map((part, j) => (
+              <span class="part">{j < row.detail.length - 1 ? `${part} · ` : part}</span>
+            ))}
+          </span>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="continue" aria-hidden="true">
+    <Icon name="ms-near-me" />
+    <span>Continue to Google Maps</span>
+  </div>
+
+  <p class="footnote muted-3">Conditions can change. Drive according to current road conditions.</p>
 </figure>
 
 <script>
-  const cards = [...document.querySelectorAll<HTMLElement>("[data-wx]")];
-  const panels = cards.map((card) => document.getElementById(`wx-${card.dataset.wx}`)!);
-
-  function openWeather(id: string | null) {
-    cards.forEach((card, i) => {
-      const open = card.dataset.wx === id;
-      card.setAttribute("aria-expanded", String(open));
-      panels[i].hidden = !open;
-    });
-  }
-
+  // The parts of the app's result screen a visitor can open and close here.
   function onActivate(el: HTMLElement, fn: () => void) {
     el.addEventListener("click", fn);
     el.addEventListener("keydown", (event) => {
@@ -366,556 +489,810 @@ const below: [number, IconName, boolean?][] = [
     });
   }
 
-  for (const card of cards) {
-    onActivate(card, () =>
-      openWeather(card.getAttribute("aria-expanded") === "true" ? null : card.dataset.wx!),
-    );
-  }
-  for (const close of document.querySelectorAll<HTMLElement>("[data-wx-close]")) {
-    close.addEventListener("click", () => openWeather(null));
+  function toggled(el: HTMLElement) {
+    const open = el.getAttribute("aria-expanded") !== "true";
+    el.setAttribute("aria-expanded", String(open));
+    return open;
   }
 
-  const more = document.querySelector<HTMLElement>("[data-more]")!;
-  const extra = document.querySelector<HTMLElement>(".row.extra")!;
-  const moreLabel = more.querySelector<HTMLElement>("[data-more-label]")!;
-  onActivate(more, () => {
-    const expand = more.getAttribute("aria-expanded") !== "true";
-    more.setAttribute("aria-expanded", String(expand));
-    extra.hidden = !expand;
-    moreLabel.textContent = expand ? "Show fewer" : "Show all 4 conditions";
+  // The weather alert shows two lines of the NWS text until it's opened.
+  const alert = document.querySelector<HTMLElement>("[data-alert]")!;
+  onActivate(alert, () => {
+    const open = toggled(alert);
+    alert.querySelector<HTMLElement>(".alert-more")!.hidden = !open;
+    alert.querySelector<HTMLElement>("[data-alert-label]")!.textContent = open
+      ? "Show less"
+      : "Show details";
+  });
+
+  // Each weather card opens its hourly forecast below the pair; only one is open at a time.
+  const anchors = [...document.querySelectorAll<HTMLElement>("[data-anchor]")];
+  function openHourly(id: string | null) {
+    for (const anchor of anchors) {
+      const open = anchor.dataset.anchor === id;
+      anchor.setAttribute("aria-expanded", String(open));
+      document.getElementById(`hourly-${anchor.dataset.anchor}`)!.hidden = !open;
+    }
+  }
+  for (const anchor of anchors) {
+    onActivate(anchor, () =>
+      openHourly(anchor.getAttribute("aria-expanded") === "true" ? null : anchor.dataset.anchor!),
+    );
+  }
+  for (const close of document.querySelectorAll<HTMLElement>("[data-close]")) {
+    close.addEventListener("click", () => openHourly(null));
+  }
+
+  // The app shrinks a weather card's forecast line to fit, down to 80% of its size, before it
+  // cuts the line off. Done here in script because CSS can't size text to its own width.
+  const forecasts = [...document.querySelectorAll<HTMLElement>("[data-fit]")];
+  function fitForecasts() {
+    for (const line of forecasts) {
+      let size = 13;
+      line.style.fontSize = `${size}px`;
+      while (line.scrollWidth > line.clientWidth && size - 0.2 >= 10.4) {
+        size -= 0.2;
+        line.style.fontSize = `${size}px`;
+      }
+    }
+  }
+  fitForecasts();
+  new ResizeObserver(fitForecasts).observe(document.querySelector(".pair")!);
+
+  // Conditions show three rows, then fold the rest behind "Show all".
+  const fold = document.querySelector<HTMLElement>("[data-fold]")!;
+  const foldLabel = fold.querySelector<HTMLElement>("[data-fold-label]")!;
+  const foldLabelClosed = foldLabel.textContent;
+  onActivate(fold, () => {
+    const open = toggled(fold);
+    for (const row of document.querySelectorAll<HTMLElement>("[data-folded='true']")) {
+      row.hidden = !open;
+    }
+    foldLabel.textContent = open ? "Show fewer conditions" : foldLabelClosed;
   });
 </script>
 
 <style>
+  /* The app's colors (constants/theme.ts in the mobile repo), dark first like the site. */
+  .result {
+    --ground: #0a1418;
+    --surface: #1c1c1e;
+    --label: #ffffff;
+    --label-2: #d1d1d6;
+    --label-3: #a1a1a6;
+    --label-4: #8e8e93;
+    --separator: #38383a;
+    --tint: #2bc6e0;
+    --tint-solid: #0a7488;
+    --tint-wash: rgba(43, 198, 224, 0.12);
+    --track: rgba(43, 198, 224, 0.32);
+    --fill: rgba(120, 120, 128, 0.24);
+    --danger: #ff6b52;
+    --brand-ink: #e9e9ed;
+    --brand-accent: #2bc6e0;
+    /* iOS separates dark cards by fill, not shadow. */
+    --card-shadow: none;
+    --hairline: 1px;
+  }
+
+  :global(:root[data-theme="light"]) .result {
+    --ground: #eaf3f6;
+    --surface: #ffffff;
+    --label: #1c1c1e;
+    --label-2: #3c3c43;
+    --label-3: #6c6c70;
+    --label-4: #8e8e93;
+    --separator: #e5e5ea;
+    --tint: #0a7488;
+    --tint-wash: rgba(10, 116, 136, 0.1);
+    --track: rgba(10, 116, 136, 0.28);
+    --fill: rgba(120, 120, 128, 0.13);
+    --danger: #c02a10;
+    --brand-ink: #161826;
+    --brand-accent: #0e8fa6;
+    --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme="dark"])) .result {
+      --ground: #eaf3f6;
+      --surface: #ffffff;
+      --label: #1c1c1e;
+      --label-2: #3c3c43;
+      --label-3: #6c6c70;
+      --label-4: #8e8e93;
+      --separator: #e5e5ea;
+      --tint: #0a7488;
+      --tint-wash: rgba(10, 116, 136, 0.1);
+      --track: rgba(10, 116, 136, 0.28);
+      --fill: rgba(120, 120, 128, 0.13);
+      --danger: #c02a10;
+      --brand-ink: #161826;
+      --brand-accent: #0e8fa6;
+      --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  /* The app draws separators one device pixel thin. */
+  @media (min-resolution: 2dppx) {
+    .result {
+      --hairline: 0.5px;
+    }
+  }
+
+  @media (min-resolution: 3dppx) {
+    .result {
+      --hairline: 0.34px;
+    }
+  }
+
   .result {
     margin: 0;
     min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 26px;
-    padding: 24px 20px 28px;
+    padding: 16px 0;
     border-radius: 24px;
-    background: color-mix(in srgb, var(--td-dot) 6%, var(--color-bg));
+    background: var(--ground);
+    color: var(--label);
     box-shadow: var(--shadow-md);
+    /* The app uses the phone's own font: SF Pro on iPhone, Roboto on Android. */
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 
   .frame-label {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     gap: 12px;
     flex-wrap: wrap;
-    padding: 0 4px;
+    padding: 0 20px 16px;
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--td-muted);
+    color: var(--label-3);
   }
 
-  .trip {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 4px;
+  /* The app's type scale (constants/design.ts). */
+  .caption {
+    font-size: 12px;
+    line-height: 16px;
   }
 
-  .trip-name {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    flex-wrap: wrap;
-    font-size: 18px;
+  .subtitle {
+    font-size: 13px;
+    line-height: 17.5px;
+  }
+
+  .row-title {
+    font-size: 16px;
+    line-height: 21px;
+  }
+
+  .body {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .sheet-title {
+    font-size: 20px;
+    line-height: 25px;
     font-weight: 600;
-    letter-spacing: -0.2px;
+    letter-spacing: -0.4px;
   }
 
-  .trip-name :global(.trip-arrow) {
+  .sheet-note {
     font-size: 14px;
-    vertical-align: 0;
+    line-height: 20px;
   }
 
-  .share {
-    width: 36px;
-    height: 36px;
+  .alert-kicker {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+
+  .strong {
+    font-weight: 600;
+  }
+
+  .muted-2 {
+    color: var(--label-2);
+  }
+
+  .muted-3 {
+    color: var(--label-3);
+  }
+
+  .muted-4 {
+    color: var(--label-4);
+  }
+
+  .tint {
+    color: var(--tint);
+  }
+
+  .danger {
+    color: var(--danger);
+  }
+
+  .one-line {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  .section-header {
+    margin: 0;
+    padding: 22px 32px 7px;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--tint);
+  }
+
+  .card {
+    margin: 0 16px;
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: var(--card-shadow);
+  }
+
+  .card[role="button"] {
+    cursor: pointer;
+  }
+
+  .card[role="button"]:active {
+    opacity: 0.7;
+  }
+
+  /* The trip's ends: a ringed origin and a haloed destination, drawn as the logo draws them. */
+  .dot-origin {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    border-radius: 50%;
+    border: 4px solid var(--brand-ink);
+    background: var(--surface);
+  }
+
+  .dot-destination {
+    position: relative;
+    width: 21px;
+    height: 21px;
     flex: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 18px;
-    background: var(--color-surface);
-    box-shadow: var(--shadow-sm);
-    color: var(--color-accent);
-    font-size: 14px;
   }
 
-  .group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  .dot-destination::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--brand-accent);
+    opacity: 0.18;
   }
 
-  .card {
-    display: flex;
-    flex-direction: column;
+  .dot-destination div {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--brand-accent);
+  }
+
+  .from-to {
+    margin: 0 16px 6px;
     border-radius: 14px;
-    background: var(--color-surface);
-    box-shadow: var(--shadow-sm);
+    background: var(--surface);
   }
 
-  .card[hidden],
-  .row[hidden] {
-    display: none;
-  }
-
-  .checked {
-    font-size: 13px;
-    color: var(--td-muted);
-    padding: 0 4px;
-  }
-
-  .summary {
+  .from-to-top,
+  .from-to-footer {
+    display: flex;
     gap: 12px;
-    padding: 20px;
+    padding: 16px 16px 14px;
   }
 
-  .summary-title {
-    font-size: 22px;
-    font-weight: 600;
-    line-height: 1.25;
-    letter-spacing: -0.5px;
-    text-wrap: balance;
+  .from-to-footer {
+    padding-top: 12px;
+    border-top: var(--hairline) solid var(--separator);
+  }
+
+  .rail {
+    width: 21px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 5px;
+  }
+
+  .rail-line {
+    flex: 1;
+    width: 2px;
+    min-height: 14px;
+    margin: 4px 0;
+    border-radius: 1px;
+    background: var(--track);
+  }
+
+  .places {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .places .caption {
+    margin-bottom: 1px;
+  }
+
+  .footer-glyph {
+    width: 21px;
+    display: flex;
+    justify-content: center;
+    padding-top: 2px;
+    font-size: 14px;
+    color: var(--label-3);
   }
 
   .summary-text {
-    font-size: 15px;
-    line-height: 1.55;
-    color: var(--td-soft);
+    margin: 0;
+    min-height: 72px;
+  }
+
+  .listen {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    height: 32px;
+    margin: 8px 0 0 auto;
+    padding: 0 12px;
+    border-radius: 16px;
+    background: var(--tint-wash);
+    color: var(--tint);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .listen :global(.icon) {
+    font-size: 13px;
   }
 
   .feedback {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 8px;
-    padding-top: 14px;
-    border-top: 1px solid var(--color-divider);
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: var(--hairline) solid var(--separator);
   }
 
   .feedback-text {
     flex: 1;
-    min-width: 0;
     display: flex;
     flex-direction: column;
-    font-size: 13px;
-    line-height: 1.35;
-    color: var(--td-soft);
   }
 
-  .feedback-text .ai {
-    font-size: 12px;
-    color: var(--td-muted);
-  }
-
-  .round {
+  .thumb {
     width: 38px;
     height: 38px;
-    flex: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 0;
-    border-radius: 19px;
-    background: color-mix(in srgb, var(--td-muted) 18%, transparent);
-    color: var(--td-muted);
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  .round:hover {
-    color: var(--color-accent);
-  }
-
-  .round.small {
-    width: 32px;
-    height: 32px;
-    border-radius: 16px;
-    font-size: 13px;
-  }
-
-  .section-label {
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-    padding: 0 6px;
-  }
-
-  .weather {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .weather-cards {
-    display: flex;
-    gap: 12px;
-  }
-
-  .wx-card {
-    flex: 1 1 0;
-    min-width: 0;
-    gap: 4px;
-    padding: 16px;
-    cursor: pointer;
-    outline-offset: 2px;
-  }
-
-  .wx-card:hover {
-    box-shadow: var(--shadow-md);
-  }
-
-  .wx-where {
-    font-size: 12px;
-    color: var(--td-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .wx-temp {
-    font-size: 30px;
-    font-weight: 600;
-    line-height: 1.15;
-    letter-spacing: -0.4px;
-  }
-
-  .wx-summary {
-    font-size: 13px;
-    line-height: 1.35;
-    color: var(--td-soft);
-  }
-
-  .wx-preview {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: auto;
-    padding-top: 12px;
-    border-top: 1px solid var(--color-divider);
-  }
-
-  .wx-preview-hours {
-    flex: 1;
-    min-width: 0;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 2px;
-  }
-
-  .wx-preview-hours > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
-    min-width: 0;
-  }
-
-  .wx-time {
-    font-size: 12px;
-    color: var(--td-muted);
-  }
-
-  .wx-preview-temp {
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  .wx-preview :global(.wx-chevron) {
-    font-size: 11px;
-    color: var(--color-accent);
-  }
-
-  .wx-panel {
-    gap: 12px;
-    padding: 16px 0 14px;
-  }
-
-  .wx-panel-head {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 16px 0 18px;
-  }
-
-  .wx-panel-head span {
-    flex: 1;
-    min-width: 0;
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  .wx-hours {
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    padding: 0 14px 2px;
-    scrollbar-width: thin;
-  }
-
-  .wx-hour {
-    flex: 0 0 52px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    padding: 8px 0;
-    border-radius: 10px;
-    font-size: 14px;
-  }
-
-  .wx-hour-temp {
-    font-size: 15px;
-    font-weight: 500;
-  }
-
-  .wx-pop {
-    font-size: 12px;
-    color: var(--td-soft);
-  }
-
-  .advisory {
-    gap: 4px;
-    padding: 16px 18px;
-    box-shadow: inset 0 0 0 1px var(--color-divider);
-    font-size: 13px;
-    line-height: 1.4;
-    color: var(--td-soft);
-  }
-
-  .advisory-title {
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.55;
-    color: var(--color-text);
-  }
-
-  .route {
-    gap: 12px;
-    padding: 20px 22px 18px;
-  }
-
-  .track {
-    position: relative;
-    height: 84px;
-    margin: 0 8px;
-  }
-
-  .base {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 41px;
-    height: 2px;
-    border-radius: 1px;
-    background: var(--td-rule);
-  }
-
-  .segment {
-    position: absolute;
-    top: 40px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--td-dot);
-  }
-
-  .marker {
-    position: absolute;
-    width: 0;
-    height: 34px;
-  }
-
-  .marker.above {
-    top: 0;
-  }
-
-  .marker.below {
-    bottom: 0;
-  }
-
-  .tick {
-    position: absolute;
-    left: -0.75px;
-    width: 1.5px;
-    height: 13px;
-    background: var(--td-muted);
-    opacity: 0.55;
-  }
-
-  .above .tick {
-    bottom: 0;
-  }
-
-  .below .tick {
-    top: 0;
-  }
-
-  .glyph {
-    position: absolute;
-    left: 0;
-    transform: translateX(-50%);
-    line-height: 1;
-    font-size: 14px;
-    display: flex;
-  }
-
-  .above .glyph {
-    top: 0;
-  }
-
-  .below .glyph {
-    bottom: 0;
-  }
-
-  /* Material Symbols carry padding inside their box, so they run a size up. */
-  .glyph :global(.icon-ms) {
+    border-radius: 50%;
+    background: var(--fill);
+    color: var(--label-3);
     font-size: 17px;
   }
 
-  .muted {
-    color: var(--td-muted);
-  }
-
-  .origin {
-    position: absolute;
-    left: -6px;
-    top: 36px;
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    border: 4px solid var(--color-text);
-    background: var(--color-surface);
-  }
-
-  .destination {
-    position: absolute;
-    right: -10px;
-    top: 32px;
-    width: 21px;
-    height: 21px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .destination::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: var(--td-dot);
-    opacity: 0.18;
-  }
-
-  .destination div {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--td-dot);
-  }
-
-  .ends {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .distance {
-    font-size: 13px;
-    color: var(--td-muted);
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: 24px minmax(0, 1fr);
-    column-gap: 14px;
-    align-items: center;
-    padding: 14px 18px;
-  }
-
-  /* A divider sits under the text column, as in the app, so it starts at the text. */
-  .row.divided .row-text {
-    padding-bottom: 14px;
-    margin-bottom: -14px;
-    border-bottom: 1px solid var(--color-divider);
-  }
-
-  .row.extra {
-    border-top: 1px solid var(--color-divider);
-  }
-
-  .row-icon {
-    display: flex;
-    justify-content: center;
-    font-size: 16px;
-  }
-
-  .row-icon :global(.icon-ms) {
-    font-size: 20px;
-  }
-
-  .row-text {
+  .alert {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    min-width: 0;
+    gap: 4px;
+    margin-bottom: 10px;
   }
 
-  .row-title {
-    font-size: 15px;
-    line-height: 1.35;
+  .alert-text {
+    margin-top: 4px;
   }
 
-  .row-meta {
-    font-size: 13px;
-    line-height: 1.4;
-    color: var(--td-muted);
+  /* NWS text comes with line breaks between its bullets, which the app keeps. */
+  .alert-description {
+    white-space: pre-line;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
   }
 
-  .more {
+  .alert[aria-expanded="true"] .alert-description {
+    display: block;
+  }
+
+  .alert-more {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .pair {
+    display: flex;
+    gap: 10px;
+    margin: 0 16px;
+  }
+
+  /* Every weather card keeps a 1.5px ring, clear until it's open, so opening one doesn't shift it. */
+  .anchor {
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14.5px 14.5px 2.5px;
+    border: 1.5px solid transparent;
+  }
+
+  .anchor[aria-expanded="true"] {
+    border-color: var(--tint);
+  }
+
+  .temperature {
+    font-size: 30px;
+    line-height: 36px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+  }
+
+  .preview {
+    display: flex;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: var(--hairline) solid var(--separator);
+  }
+
+  .preview > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 15px 18px;
-    border-top: 1px solid var(--color-divider);
-    font-size: 15px;
-    color: var(--color-accent);
-    cursor: pointer;
-    border-radius: 0 0 14px 14px;
   }
 
-  .more:hover {
-    background: color-mix(in srgb, var(--color-accent) 7%, transparent);
+  .forecast-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--tint);
   }
 
-  .more :global(.icon) {
-    font-size: 12px;
-    color: var(--td-muted);
+  .forecast-link :global(.icon) {
+    font-size: 10px;
+    vertical-align: 0;
   }
 
-  .more :global(.more-up),
-  .more[aria-expanded="true"] :global(.more-down) {
+  .forecast-link :global(.when-open),
+  .anchor[aria-expanded="true"] .forecast-link :global(.when-closed) {
     display: none;
   }
 
-  .more[aria-expanded="true"] :global(.more-up) {
+  .anchor[aria-expanded="true"] .forecast-link :global(.when-open) {
     display: inline-block;
+  }
+
+  .hourly {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .hourly-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .hourly-close {
+    display: flex;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--label-3);
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .hours {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .hour {
+    flex: 0 0 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .hour :global(.hour-glyph) {
+    font-size: 20px;
+    color: var(--label-2);
+  }
+
+  .route {
+    padding: 0;
+  }
+
+  .route-names {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px 0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+
+  .route-names span:last-child {
+    text-align: right;
+  }
+
+  /* The route line is a distance axis. Measurements are the app's route-line.tsx. */
+  .route-line {
+    display: flex;
+    align-items: center;
+    min-height: 84px;
+    padding: 0 29px;
+  }
+
+  .track-area {
+    position: relative;
+    flex: 1;
+    height: 60px;
+  }
+
+  .track {
+    position: absolute;
+    left: 0;
+    right: -3.5px;
+    top: 29px;
+    height: 2px;
+    background: var(--track);
+  }
+
+  .stretch {
+    position: absolute;
+    top: 28px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--tint);
+  }
+
+  .pin {
+    position: absolute;
+    width: 20px;
+    margin-left: -10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--label-2);
+  }
+
+  .pin.above {
+    top: 0;
+    color: var(--tint);
+  }
+
+  .pin.below {
+    top: 30px;
+  }
+
+  .pin.incident {
+    color: var(--danger);
+  }
+
+  .pin-glyph {
+    height: 16px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .connector {
+    width: 1px;
+    height: 14px;
+    background: currentColor;
+  }
+
+  .separator {
+    height: var(--hairline);
+    margin-left: 20px;
+    background: var(--separator);
+  }
+
+  .roads {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 20px 14px;
+  }
+
+  .roads-label {
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+
+  .shield-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .shield {
+    display: flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 0 7px;
+    border: 1.5px solid var(--label-2);
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0.2px;
+  }
+
+  .shield-row :global(.roads-chevron) {
+    margin-top: 5px;
+    font-size: 13px;
+    color: var(--label-4);
+  }
+
+  .directions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 50px;
+    padding: 0 16px 0 20px;
+    color: var(--tint);
+  }
+
+  .directions-icon {
+    width: 22px;
+    display: flex;
+    justify-content: center;
+    font-size: 15px;
+  }
+
+  .directions-label {
+    flex: 1;
+    font-size: 17px;
+    letter-spacing: -0.2px;
+  }
+
+  .directions :global(.directions-chevron) {
+    font-size: 12px;
+    color: var(--label-4);
+  }
+
+  /* A grouped list: rows on one surface, with a separator inset 16px from the left. */
+  .group {
+    margin: 0 16px;
+    border: 1.5px solid transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 16px;
+  }
+
+  .row + .row::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 0;
+    height: var(--hairline);
+    background: var(--separator);
+  }
+
+  .row-glyph {
+    display: flex;
+    font-size: 16px;
+  }
+
+  .row-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* Each " · " part wraps as a whole, so "Cleared 7:30 AM" never splits across lines. */
+  .part {
+    display: inline-block;
+    max-width: 100%;
+    white-space: pre-wrap;
+  }
+
+  .cleared {
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--fill);
+    color: var(--label-2);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+  }
+
+  .fold {
+    cursor: pointer;
+  }
+
+  .fold .row-title {
+    flex: 1;
+  }
+
+  .fold:active {
+    background: var(--fill);
+  }
+
+  .fold :global(.fold-chevron) {
+    font-size: 15px;
+    color: var(--label-4);
+  }
+
+  .continue {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 50px;
+    margin: 22px 16px 0;
+    padding: 0 16px;
+    border-radius: 12px;
+    background: var(--tint-solid);
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+
+  .continue :global(.icon) {
+    font-size: 17px;
+  }
+
+  .footnote {
+    margin: 0;
+    padding: 12px 20px 0;
+    font-size: 13px;
+    line-height: 19px;
   }
 </style>
