@@ -79,9 +79,9 @@ function hourLabel(index: number) {
 // The app picks an hour's icon from the forecast's words, first match wins. Only the three the
 // sample needs are here.
 function forecastIcon(words: string): IconName {
-  if (/(rain|drizzle).*snow|snow.*(rain|drizzle)/i.test(words)) return "ms-weather-mix";
-  if (/snow/i.test(words)) return "ms-weather-snowy";
-  return "ms-rainy";
+  if (/(rain|drizzle).*snow|snow.*(rain|drizzle)/i.test(words)) return "ms:weather_mix";
+  if (/snow/i.test(words)) return "ms:weather_snowy";
+  return "ms:rainy";
 }
 
 const alert = {
@@ -110,22 +110,22 @@ interface Row {
 // it checks for snow or slush before wet or visibility.
 const conditions: Row[] = [
   {
-    icon: "snowflake",
+    icon: "fa:snowflake",
     title: "Wet pavement and slush",
     detail: ["Mile 2–12", "US-169", "northbound, southbound"],
   },
   {
-    icon: "ms-severe-cold",
+    icon: "custom:ice",
     title: "Ice on roadway",
     detail: ["Mile 13–31", "US-169", "northbound, southbound"],
   },
   {
-    icon: "snowflake",
+    icon: "fa:snowflake",
     title: "Snow-covered roadway",
     detail: ["Mile 32–43", "US-169", "northbound, southbound"],
   },
   {
-    icon: "snowflake",
+    icon: "fa:snowflake",
     title: "Reduced visibility, blowing snow",
     detail: ["Mile 43–58", "US-169", "northbound"],
   },
@@ -136,7 +136,7 @@ const PREVIEW_ROWS = 3;
 
 const activeIncidents: Row[] = [
   {
-    icon: "car-burst",
+    icon: "fa:car-burst",
     title: "US-169: Crash reported",
     note: "right lane blocked",
     detail: ["Mile 36", "northbound"],
@@ -145,7 +145,7 @@ const activeIncidents: Row[] = [
 
 const clearedIncidents: Row[] = [
   {
-    icon: "car-burst",
+    icon: "fa:car-burst",
     title: "US-169: Vehicle spun out",
     detail: ["Mile 18", "northbound", "Cleared 7:30 AM"],
   },
@@ -153,12 +153,12 @@ const clearedIncidents: Row[] = [
 
 const advisories: Row[] = [
   {
-    icon: "ms-local-shipping",
+    icon: "fa:road-barrier",
     title: "US-169: Snowplow activity",
     detail: ["Mile 28–42", "northbound, southbound"],
   },
   {
-    icon: "ms-thunderstorm",
+    icon: "ms:thunderstorm-fill",
     title: "US-169: Reduced visibility",
     detail: ["Mile 43–58", "northbound"],
   },
@@ -175,16 +175,16 @@ const stretches = [
 // Above the line, one icon per condition. Touching stretches with the same icon share one, so
 // the two snowflakes from mile 32 to 58 draw as a single mark in the middle of that span.
 const conditionMarks: [start: number, end: number, IconName][] = [
-  [2, 12, "snowflake"],
-  [13, 31, "ms-severe-cold"],
-  [32, 58, "snowflake"],
+  [2, 12, "fa:snowflake"],
+  [13, 31, "custom:ice"],
+  [32, 58, "fa:snowflake"],
 ];
 
 // Below the line, one icon per event at its mile: incidents in red, everything else grey.
 const eventMarks: [mile: number, IconName, incident: boolean][] = [
-  [28, "ms-local-shipping", false],
-  [36, "car-burst", true],
-  [43, "ms-thunderstorm", false],
+  [28, "fa:road-barrier", false],
+  [36, "fa:car-burst", true],
+  [43, "ms:thunderstorm-fill", false],
 ];
 ---
 
@@ -216,7 +216,7 @@ const eventMarks: [mile: number, IconName, incident: boolean][] = [
     </div>
     <div class="from-to-footer">
       <div class="footer-glyph">
-        <Icon name="ms-history" />
+        <Icon name="ms:history" padded />
       </div>
       <div class="subtitle muted-3">Checked 8:00 AM · road data as of 7:42 AM</div>
     </div>
@@ -232,7 +232,7 @@ const eventMarks: [mile: number, IconName, incident: boolean][] = [
       Advisory is in effect until 4 PM.
     </p>
     <div class="listen" aria-hidden="true">
-      <Icon name="ms-volume-down" />
+      <Icon name="fa:volume-low" padded />
       <span>Listen</span>
     </div>
     <div class="feedback">
@@ -241,10 +241,10 @@ const eventMarks: [mile: number, IconName, incident: boolean][] = [
         <span class="subtitle muted-3">Was this summary helpful?</span>
       </div>
       <div class="thumb" aria-hidden="true">
-        <Icon name="ms-thumb-up" />
+        <Icon name="fa-regular:thumbs-up" padded />
       </div>
       <div class="thumb" aria-hidden="true">
-        <Icon name="ms-thumb-down" />
+        <Icon name="fa-regular:thumbs-down" padded />
       </div>
     </div>
   </div>
@@ -298,8 +298,8 @@ const eventMarks: [mile: number, IconName, incident: boolean][] = [
         </div>
         <div class="forecast-link">
           <span>Hourly forecast</span>
-          <Icon name="ms-keyboard-arrow-down" class="when-closed" />
-          <Icon name="ms-keyboard-arrow-up" class="when-open" />
+          <Icon name="fa:chevron-down" class="when-closed" padded />
+          <Icon name="fa:chevron-up" class="when-open" padded />
         </div>
       </div>
     ))}
@@ -318,14 +318,18 @@ const eventMarks: [mile: number, IconName, incident: boolean][] = [
           {place.name} · Next {place.hours.length} hours
         </span>
         <button type="button" class="hourly-close" aria-label="Close hourly forecast" data-close>
-          <Icon name="ms-close" />
+          <Icon name="fa:xmark" padded />
         </button>
       </div>
       <div class="hours">
         {place.hours.map(([temperature, chance, snow], i) => (
           <div class="hour">
             <span class="caption muted-3">{hourLabel(i)}</span>
-            <Icon name={forecastIcon(snow > 0 ? place.snowingAs : "Rain")} class="hour-glyph" />
+            <Icon
+              name={forecastIcon(snow > 0 ? place.snowingAs : "Rain")}
+              class="hour-glyph"
+              padded
+            />
             <span class="subtitle strong">{temperature}°</span>
             <span class="caption tint">{chance}%</span>
             <span class="caption muted-2">{snow > 0 ? `${snow.toFixed(1)}″` : " "}</span>
@@ -375,17 +379,17 @@ const eventMarks: [mile: number, IconName, incident: boolean][] = [
       <div class="caption muted-3 roads-label">Roads checked</div>
       <div class="shield-row">
         <span class="shield">US-169</span>
-        <Icon name="ms-chevron-right" class="roads-chevron" />
+        <Icon name="fa:chevron-right" class="roads-chevron" padded />
       </div>
       <div class="sheet-note muted-3">58 miles · 1 hr 6 min</div>
     </div>
     <div class="separator"></div>
     <div class="directions">
       <span class="directions-icon">
-        <Icon name="ms-directions" />
+        <Icon name="ms:directions" padded />
       </span>
       <span class="directions-label">View driving directions</span>
-      <Icon name="ms-chevron-right" class="directions-chevron" />
+      <Icon name="fa:chevron-right" class="directions-chevron" padded />
     </div>
   </div>
 
@@ -410,7 +414,7 @@ const eventMarks: [mile: number, IconName, incident: boolean][] = [
       <span class="row-title tint" data-fold-label>
         Show all {conditions.length} conditions
       </span>
-      <Icon name="ms-chevron-right" class="fold-chevron" />
+      <Icon name="fa:chevron-right" class="fold-chevron" padded />
     </div>
   </div>
 
@@ -470,7 +474,7 @@ const eventMarks: [mile: number, IconName, incident: boolean][] = [
   </div>
 
   <div class="continue" aria-hidden="true">
-    <Icon name="ms-near-me" />
+    <Icon name="fa:location-arrow" padded />
     <span>Continue to Google Maps</span>
   </div>
 

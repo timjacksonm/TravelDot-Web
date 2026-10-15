@@ -55,7 +55,7 @@ const faqs = [
             <details open={faq.open}>
               <summary>
                 {faq.q}
-                <Icon name="ph-caret-down" class="caret" />
+                <Icon name="fa:chevron-down" class="caret" padded />
               </summary>
               <p set:html={faq.a} />
             </details>
@@ -72,7 +72,7 @@ const faqs = [
           </div>
         </div>
         <a class="btn btn-primary" href="mailto:support@traveldot.app">
-          <Icon name="ph-envelope" class="ask-icon" />
+          <Icon name="fa-regular:envelope" class="ask-icon" padded />
           Email support
         </a>
       </div>
