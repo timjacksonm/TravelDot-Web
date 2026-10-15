@@ -4,7 +4,13 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      # @types/node tracks the Node major in engines, not the latest release
+      - dependency-name: "@types/node"
+        versions: [">=25"]
     groups:
+      fontawesome:
+        patterns: ["@fortawesome/*"]
       minor-and-patch:
         update-types: ["minor", "patch"]
   - package-ecosystem: "github-actions"
