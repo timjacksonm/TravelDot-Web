@@ -6,14 +6,14 @@ import MinnesotaMap from "../components/MinnesotaMap.astro";
 import WaitlistForm from "../components/WaitlistForm.astro";
 
 const shows: [IconName, string][] = [
-  ["snowflake", "Road conditions: ice, snow, wet pavement, visibility"],
+  ["fa:snowflake", "Road conditions: ice, snow, wet pavement, visibility"],
   [
-    "car-burst",
+    "fa:car-burst",
     "Incidents: crashes, stalled vehicles, debris, including recently cleared incidents",
   ],
-  ["ban", "Advisories: closures, lane closures, detours"],
+  ["fa:ban", "Advisories: closures, lane closures, detours"],
   [
-    "cloud",
+    "fa:cloud",
     "Weather: conditions at your origin and destination, with an hourly forecast available for a closer look",
   ],
 ];
@@ -45,11 +45,11 @@ const organization = {
       </p>
       <ul class="checks">
         <li>
-          <Icon name="ph-check" />
+          <Icon name="fa:check" padded />
           <span>One summary for your whole drive, not a map full of pins.</span>
         </li>
         <li>
-          <Icon name="ph-check" />
+          <Icon name="fa:check" padded />
           <span>Take your route into your preferred navigation app when you're ready to go.</span>
         </li>
       </ul>

@@ -257,6 +257,8 @@ a:hover {
   flex: none;
   vertical-align: -0.125em;
   fill: currentColor;
+  /* Font Awesome 7 draws some glyphs past their box, as its own renderer allows */
+  overflow: visible;
 }
 
 .visually-hidden {
