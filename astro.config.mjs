@@ -15,11 +15,14 @@ if (branch && branch !== "main") {
 // https://astro.build/config
 export default defineConfig({
   site: "https://traveldot.app",
+  // Pages build as privacy.html, so Cloudflare serves /privacy and redirects /privacy/ to it.
+  trailingSlash: "never",
+  build: { format: "file" },
   integrations: [
     // StatusLayout marks these noindex, so the sitemap leaves them out too.
     sitemap({
       filter: (page) =>
-        !["/404/", "/waitlist/confirm/", "/waitlist/unsubscribe/"].includes(new URL(page).pathname),
+        !["/404", "/waitlist/confirm", "/waitlist/unsubscribe"].includes(new URL(page).pathname),
     }),
   ],
   // The privacy copy uses straight quotes, as in the design.

@@ -32,7 +32,9 @@ const {
 
 const pageTitle = fullTitle ?? (title ? `${title} · TravelDot` : "TravelDot");
 // Crawlers and link previews need absolute URLs, so these build on `site` in astro.config.
-const pageUrl = new URL(Astro.url.pathname, Astro.site);
+// With build.format "file" the build sees /privacy.html, so strip the file name back to the served path.
+const pagePath = Astro.url.pathname.replace(/(index)?\.html$/, "");
+const pageUrl = new URL(pagePath, Astro.site);
 const shareImage = new URL("/og-image.png", Astro.site);
 const waitlistHref = current === "home" ? "#waitlist" : "/#waitlist";
 const year = new Date().getFullYear();
@@ -61,7 +63,7 @@ const year = new Date().getFullYear();
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    {/* The 404 would name /404/ as its address, so noindex pages skip canonical and og:url. */}
+    {/* The 404 would name /404 as its address, so noindex pages skip canonical and og:url. */}
     {noindex ? (
       <meta name="robots" content="noindex" />
     ) : (
