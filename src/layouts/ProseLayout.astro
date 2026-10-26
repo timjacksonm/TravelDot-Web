@@ -96,4 +96,53 @@ const { title, description, kicker = "Privacy", updated, lede } = Astro.props.fr
     line-height: 1.65;
     color: var(--td-soft);
   }
+
+  /* Other pages link straight to a section, such as /privacy/#data-retention-and-deletion. */
+  .body :global(h2) {
+    scroll-margin-top: 24px;
+  }
+
+  .body :global(:is(ul, ol)) {
+    margin: 0 0 10px;
+    padding-left: 22px;
+  }
+
+  .body :global(li) {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--td-soft);
+  }
+
+  .body :global(li + li) {
+    margin-top: 4px;
+  }
+
+  .body :global(strong) {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  /* A wide table scrolls inside itself on a phone instead of widening the page. */
+  .body :global(table) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 6px 0 10px;
+    border-collapse: collapse;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .body :global(:is(th, td)) {
+    padding: 8px 14px 8px 0;
+    border-bottom: 1px solid var(--color-divider);
+    text-align: left;
+    vertical-align: top;
+    color: var(--td-soft);
+  }
+
+  .body :global(th) {
+    font-weight: 600;
+    color: var(--color-text);
+  }
 </style>
