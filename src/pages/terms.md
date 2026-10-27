@@ -38,7 +38,7 @@ TravelDot is intended to provide helpful information, not to determine whether a
 
 ## 5. Subscriptions and payments
 
-The free plan includes a limited number of trip checks each month, shown in the app. TravelDot Plus removes that limit and adds extra features. We may add, change, or remove features of either plan. If we remove a feature from TravelDot Plus, the change applies from your next renewal, and you can cancel before then.
+The free plan includes a limited number of trip checks each month, shown in the app. TravelDot Plus has no monthly trip check limit and adds extra features. To prevent automated or abusive use, TravelDot Plus accounts are limited to 50 trip checks in any 24-hour period. We may temporarily restrict trip checks that exceed this limit. We may add, change, or remove features of either plan. If we remove a feature from TravelDot Plus, the change applies from your next renewal, and you can cancel before then.
 
 TravelDot Plus is a monthly or yearly subscription sold through the Apple App Store or Google Play. Payment is charged to your store account at purchase and at each renewal. Your subscription renews automatically until you cancel it. To stop the next renewal, cancel in your device's subscription settings before the current period ends. When you cancel, you keep TravelDot Plus until the end of the period you paid for. Deleting your TravelDot account does not cancel your subscription.
 
