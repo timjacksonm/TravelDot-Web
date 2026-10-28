@@ -2,7 +2,7 @@
 layout: ../layouts/ProseLayout.astro
 title: Privacy policy
 description: How TravelDot collects, uses, shares, and deletes your information.
-updated: October 26, 2026
+updated: October 27, 2026
 ---
 
 Northland Software LLC ("us", "we", "our", or "TravelDot") operates the TravelDot mobile app for iPhone and Android, the website at traveldot.app, and associated services ("our services").
@@ -17,7 +17,7 @@ We use your Personal Information to provide and improve our services. By using o
 
 While using our services, we ask you to provide information that can be used to contact or identify you ("Personal Information"). This includes:
 
-- **Account information.** If you sign up with email, your email address and a password. Clerk, our sign-in provider, stores the password, and we never see it. If you sign in with Apple, Google, or Facebook, Clerk receives your email address, your name, your profile photo if that service has one, and the ID that service uses for your account. Apple lets you share a private relay address instead of your real email and choose whether to share your name. Our own database keeps only your email address.
+- **Account information.** If you sign up with email, your email address. We send a one-time code to your email to sign you in. If you set a password, Clerk, our sign-in provider, stores it, and we never see it. If you sign in with Apple, Google, or Facebook, Clerk receives your email address, your name, your profile photo if that service has one, and the ID that service uses for your account. Apple lets you share a private relay address instead of your real email and choose whether to share your name. Our own database keeps only your email address.
 - **Trip checks.** The start and end you choose for each check: the place name, plus the coordinates, city, and state Google Places returns for it, or your device's location if you choose Current location. We store each check with what it found: the route's distance and highways, road conditions, incidents, weather, and the trip summary. These make up your History.
 - **Location.** Your device's precise location, read once, only when you choose Current location for a trip check. See [Location data](#location-data) below.
 - **Favorite trips.** The places you save, if you subscribe to TravelDot Plus.
