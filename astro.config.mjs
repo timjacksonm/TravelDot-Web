@@ -21,8 +21,7 @@ export default defineConfig({
   integrations: [
     // StatusLayout marks these noindex, so the sitemap leaves them out too.
     sitemap({
-      filter: (page) =>
-        !["/404", "/waitlist/confirm", "/waitlist/unsubscribe"].includes(new URL(page).pathname),
+      filter: (page) => !["/404", "/waitlist/unsubscribe"].includes(new URL(page).pathname),
     }),
   ],
   // The privacy copy uses straight quotes, as in the design.
