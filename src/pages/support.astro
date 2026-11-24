@@ -1,11 +1,12 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Icon from "../components/Icon.astro";
+import { APP_STORE_URL, GOOGLE_PLAY_URL } from "../lib/stores";
 
 const faqs = [
   {
-    q: "When does TravelDot launch?",
-    a: `We're not announcing a date yet. Join the <a href="/#waitlist">waitlist</a> and we'll email you when it's ready to download.`,
+    q: "Where do I get it?",
+    a: `On the <a href="${APP_STORE_URL}">App Store</a> for iPhone and on <a href="${GOOGLE_PLAY_URL}">Google Play</a> for Android.`,
     open: true,
   },
   { q: "Which phones will it work on?", a: "iPhone and Android." },
@@ -23,7 +24,19 @@ const faqs = [
   },
   {
     q: "Does it work outside Minnesota?",
-    a: "Not yet. TravelDot covers all of Minnesota at launch.",
+    a: "Not yet. TravelDot covers all of Minnesota.",
+  },
+  {
+    q: "Is it free?",
+    a: "Yes. A free account gets 5 trip checks a month. TravelDot Plus is $2.99 a month or $19.99 a year and adds unlimited checks, favorite trips, checking again from History, and trip summaries read aloud.",
+  },
+  {
+    q: "How do I cancel TravelDot Plus?",
+    a: "Plus is billed by Apple or Google, so you cancel it where you subscribed: in your Apple ID's Subscriptions on iPhone, or in Google Play's Payments & subscriptions on Android. You keep Plus until the end of the period you paid for.",
+  },
+  {
+    q: "How do I delete my account?",
+    a: `In the app, go to Account and choose Delete account. You can also <a href="/delete-account">ask us to delete it</a>.`,
   },
   {
     q: "How do I leave the waitlist?",
@@ -34,17 +47,17 @@ const faqs = [
 
 <BaseLayout
   title="Support"
-  description="Answers about TravelDot, the launch and the waitlist."
+  description="Answers about TravelDot, TravelDot Plus and your account."
   current="support"
 >
   <main class="wrap">
     <div class="content">
       <div class="intro">
         <div class="kicker">Support</div>
-        <h1>Answers before launch.</h1>
+        <h1>Answers about TravelDot.</h1>
         <p>
-          TravelDot isn't in the App Store or Google Play yet, so most questions right now are about
-          the launch and the waitlist.
+          Common questions about trip checks, TravelDot Plus and your account. Can't find yours? Get
+          in touch.
         </p>
       </div>
 

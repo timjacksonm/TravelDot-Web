@@ -3,7 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import ExampleResult from "../components/ExampleResult.astro";
 import Icon, { type IconName } from "../components/Icon.astro";
 import MinnesotaMap from "../components/MinnesotaMap.astro";
-import WaitlistForm from "../components/WaitlistForm.astro";
+import { APP_STORE_URL, GOOGLE_PLAY_URL } from "../lib/stores";
 
 const shows: [IconName, string][] = [
   ["fa:snowflake", "Road conditions: ice, snow, wet pavement, visibility"],
@@ -30,14 +30,14 @@ const organization = {
 
 <BaseLayout
   fullTitle="TravelDot · Know before you go"
-  description="Road conditions from official transportation feeds and reports, summarized in plain language so you know what to expect along your drive. Coming to iPhone and Android."
+  description="Road conditions from official transportation feeds and reports, summarized in plain language so you know what to expect along your drive. Available on iPhone and Android."
   current="home"
   glow="home"
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(organization)} />
   <main class="wrap">
     <section class="hero">
-      <div class="kicker">Coming to iPhone and Android</div>
+      <div class="kicker">Now on iPhone and Android</div>
       <h1>Know what’s ahead before you hit the road.</h1>
       <p class="lede">
         Road conditions from official transportation feeds and reports, summarized in plain language
@@ -53,7 +53,14 @@ const organization = {
           <span>Take your route into your preferred navigation app when you're ready to go.</span>
         </li>
       </ul>
-      <WaitlistForm />
+      <div class="stores" id="download">
+        <a href={APP_STORE_URL} aria-label="Download TravelDot on the App Store">
+          <img class="badge-apple" src="/badges/app-store.svg" alt="Download on the App Store" />
+        </a>
+        <a href={GOOGLE_PLAY_URL} aria-label="Get TravelDot on Google Play">
+          <img class="badge-google" src="/badges/google-play.png" alt="Get it on Google Play" />
+        </a>
+      </div>
     </section>
 
     <div class="rule"></div>
@@ -87,8 +94,8 @@ const organization = {
       <div class="minnesota-copy">
         <h2>All of Minnesota. Built on the Iron Range.</h2>
         <p>
-          TravelDot covers all of Minnesota at launch. It started on the Iron Range, where winter
-          weather can change road conditions quickly and knowing what’s ahead matters.
+          TravelDot covers all of Minnesota. It started on the Iron Range, where winter weather can
+          change road conditions quickly and knowing what’s ahead matters.
         </p>
       </div>
       <MinnesotaMap />
@@ -153,6 +160,30 @@ const organization = {
 
   .checks {
     gap: 12px;
+  }
+
+  .stores {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .stores a {
+    display: block;
+    line-height: 0;
+  }
+
+  .badge-apple {
+    height: 48px;
+    width: auto;
+  }
+
+  /* Google's PNG carries transparent padding, so it's taller to match Apple's visible size. */
+  .badge-google {
+    height: 70px;
+    width: auto;
+    margin: -11px -9px;
   }
 
   .checks li {

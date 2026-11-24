@@ -7,19 +7,13 @@ interface Props {
   title: string;
   description: string;
   glow?: "page";
-  waitlistButton?: boolean;
+  getAppButton?: boolean;
 }
 
-const { title, description, glow, waitlistButton } = Astro.props;
+const { title, description, glow, getAppButton } = Astro.props;
 ---
 
-<BaseLayout
-  title={title}
-  description={description}
-  glow={glow}
-  waitlistButton={waitlistButton}
-  noindex
->
+<BaseLayout title={title} description={description} glow={glow} getAppButton={getAppButton} noindex>
   <main class="wrap status-main">
     <slot />
   </main>
