@@ -6,6 +6,7 @@ import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal
 import monoLatin from "@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url";
 import Icon from "../components/Icon.astro";
 import Lockup from "../components/Lockup.astro";
+import { APP_STORE_ID } from "../lib/stores";
 
 interface Props {
   // Page name for the browser tab, e.g. "Privacy". The home page passes the full title instead.
@@ -16,8 +17,8 @@ interface Props {
   glow?: "home" | "page";
   // Token pages and the 404 have nothing worth indexing.
   noindex?: boolean;
-  // The waitlist pages hide the header's join button: those visitors already joined or are leaving.
-  waitlistButton?: boolean;
+  // The waitlist pages hide the header's download button: those visitors came from an email.
+  getAppButton?: boolean;
 }
 
 const {
@@ -27,7 +28,7 @@ const {
   current = "other",
   glow,
   noindex = false,
-  waitlistButton = true,
+  getAppButton = true,
 } = Astro.props;
 
 const pageTitle = fullTitle ?? (title ? `${title} · TravelDot` : "TravelDot");
@@ -36,7 +37,7 @@ const pageTitle = fullTitle ?? (title ? `${title} · TravelDot` : "TravelDot");
 const pagePath = Astro.url.pathname.replace(/(index)?\.html$/, "");
 const pageUrl = new URL(pagePath, Astro.site);
 const shareImage = new URL("/og-image.png", Astro.site);
-const waitlistHref = current === "home" ? "#waitlist" : "/#waitlist";
+const downloadHref = current === "home" ? "#download" : "/#download";
 const year = new Date().getFullYear();
 
 // Social links are hidden for now. To show them, uncomment this and the list in the footer.
@@ -61,6 +62,7 @@ const year = new Date().getFullYear();
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-itunes-app" content={`app-id=${APP_STORE_ID}`} />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     {/* The 404 would name /404 as its address, so noindex pages skip canonical and og:url. */}
@@ -107,9 +109,9 @@ const year = new Date().getFullYear();
           >
             Support
           </a>
-          {waitlistButton && (
-            <a class="btn btn-primary" href={waitlistHref}>
-              Join the waitlist
+          {getAppButton && (
+            <a class="btn btn-primary" href={downloadHref}>
+              Get the app
             </a>
           )}
           <button
